@@ -1,12 +1,12 @@
 package com.github.tzarouali.app
 
-import akka.http.scaladsl.{Http, server}
+import akka.http.scaladsl.Http
 
 import scala.util.{Failure, Success}
 
 object WebMonitorServer extends ActorConfig with WebMonitorRoutes with App {
 
-  val route: server.Route = allRoutes
+  val route = allRoutes
 
   val port = 8000
 
