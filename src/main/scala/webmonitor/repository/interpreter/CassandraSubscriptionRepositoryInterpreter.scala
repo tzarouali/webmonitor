@@ -8,7 +8,7 @@ import com.outworkers.phantom.dsl._
 import com.outworkers.phantom.keys.PartitionKey
 import webmonitor.model.Subscription
 import webmonitor.repository.SubscriptionRepository
-import webmonitor.repository.config.RepositoryConfigReader
+import webmonitor.config.ApplicationConfigReader
 import webmonitor.webmonitor.RepoResult
 
 trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[RepoResult] {
@@ -33,16 +33,17 @@ trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[
         .insert
         .value(_.id, subscription.id)
         .value(_.url, subscription.url)
-        .value(_.extractor, subscription.jqueryExtractor)
+        .value(_.jqueryExtractor, subscription.jqueryExtractor)
         .value(_.userId, subscription.userId)
         .future()
         .map(_ => ())
     }
   }
+
 }
 
 object CassandraSubscriptionRepositoryInterpreter extends CassandraSubscriptionRepositoryInterpreter {
-  lazy val connector: CassandraConnection = RepositoryConfigReader.config.cassandraKeySpace
+  lazy val connector: CassandraConnection = ApplicationConfigReader.config.cassandraKeySpace
 
   class Subscriptions extends Table[Subscriptions, Subscription] with connector.Connector {
 
@@ -50,7 +51,7 @@ object CassandraSubscriptionRepositoryInterpreter extends CassandraSubscriptionR
 
     object url extends StringColumn
 
-    object extractor extends StringColumn
+    object jqueryExtractor extends StringColumn
 
     object userId extends UUIDColumn with PartitionKey
 

@@ -54,8 +54,8 @@ val strictScalacOptions = Seq(
   "-Ywarn-value-discard"               // Warn when non-Unit expression results are unused.
 )
 
-lazy val root = (project in file(".")).
-  settings(
+lazy val root = (project in file("."))
+  .settings(
     inThisBuild(List(
       organization := "com.github.tzarouali",
       scalaVersion := "2.12.3",
