@@ -1,9 +1,12 @@
 package com.github.tzarouali.app
 
+import java.util.UUID
+
 import akka.http.scaladsl.server.Directives._
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 import io.circe.generic.auto._
 import io.circe.syntax.EncoderOps
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
@@ -17,11 +20,10 @@ trait WebMonitorRoutes extends ErrorAccumulatingCirceSupport {
 
   val subscriptionRoutes = path("user") {
     complete(
-      findSubscriptions("u1").run(()).unsafeRunSync().map({
-        case asd => asd.asJson
-      }).recover({
-        case e => e.getMessage.asJson
-      })
+      findSubscriptions(UUID.randomUUID()).run(()).unsafeRunSync().map(_.asJson)
+        .recover({
+          case e => e.getMessage.asJson
+        })
     )
   }
 

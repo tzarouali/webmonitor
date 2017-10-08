@@ -1,5 +1,8 @@
 package com.github.tzarouali.model
 
-case class Subscription(url: String,
-                        extractor: String,
-                        username: String)
+import java.util.UUID
+
+case class Subscription(id: UUID,
+                        url: String,
+                        jqueryExtractor: String,
+                        userId: UUID)
