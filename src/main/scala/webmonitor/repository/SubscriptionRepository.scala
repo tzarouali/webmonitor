@@ -2,10 +2,8 @@ package webmonitor.repository
 
 import java.util.UUID
 
-import webmonitor.model.Subscription
+trait SubscriptionRepository[F[_], G[_], SUBSCRIPTION] {
+  def findSubscriptions(userId: UUID): F[G[Vector[SUBSCRIPTION]]]
 
-trait SubscriptionRepository[F[_]] {
-  def findSubscriptions(userId: UUID): F[Vector[Subscription]]
-
-  def storeSubscription(subscription: Subscription): F[Unit]
+  def storeSubscription(subscription: SUBSCRIPTION): F[G[Unit]]
 }
