@@ -5,7 +5,7 @@ import webmonitor.config.{ApplicationEnvironmentVar, LocalApplicationConfig}
 
 import scala.util.{Failure, Success}
 
-object WebMonitorServer extends WebMonitorRoutes with App {
+object WebMonitorServer extends ActorConfig with WebMonitorRoutes with App {
 
   val route = allRoutes
 

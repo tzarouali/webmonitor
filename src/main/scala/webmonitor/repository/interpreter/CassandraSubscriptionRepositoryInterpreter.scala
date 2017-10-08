@@ -11,7 +11,7 @@ import webmonitor.repository.SubscriptionRepository
 
 import scala.concurrent.Future
 
-trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[IO, Future, Subscription] {
+trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[IO, Future, Subscription, UUID] {
 
   import CassandraSubscriptionRepositoryInterpreter._
   import CassandraSubscriptionRepositoryInterpreter.subscriptionTable._

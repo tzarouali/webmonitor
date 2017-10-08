@@ -1,8 +1,9 @@
 package webmonitor.app
 
+import akka.http.scaladsl.server.Directives._
 
-trait WebMonitorRoutes extends SubscriptionRoutes {
+trait WebMonitorRoutes {
 
-  val allRoutes = subscriptionRoutes
+  val allRoutes = SubscriptionRoutes.subscriptionRoutes ~ UserRoutes.userRoutes
 
 }

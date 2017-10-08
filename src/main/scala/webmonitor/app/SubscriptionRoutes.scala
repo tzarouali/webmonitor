@@ -40,3 +40,5 @@ trait SubscriptionRoutes extends ActorConfig with ErrorAccumulatingCirceSupport 
   }
 
 }
+
+object SubscriptionRoutes extends SubscriptionRoutes
