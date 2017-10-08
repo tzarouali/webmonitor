@@ -1,4 +1,4 @@
-package com.github.tzarouali.repository.config
+package webmonitor.repository.config
 
 import com.outworkers.phantom.connectors.{CassandraConnection, ContactPoint}
 

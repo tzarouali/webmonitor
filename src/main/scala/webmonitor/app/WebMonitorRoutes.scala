@@ -1,4 +1,4 @@
-package com.github.tzarouali.app
+package webmonitor.app
 
 import java.util.UUID
 
@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait WebMonitorRoutes extends ErrorAccumulatingCirceSupport {
 
-  import com.github.tzarouali.repository.interpreter.CassandraSubscriptionRepositoryInterpreter._
+  import webmonitor.repository.interpreter.CassandraSubscriptionRepositoryInterpreter._
 
   val allRoutes = pathPrefix("subscriptions") {
     subscriptionRoutes

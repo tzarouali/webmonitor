@@ -1,4 +1,4 @@
-package com.github.tzarouali.app
+package webmonitor.app
 
 import akka.http.scaladsl.Http
 

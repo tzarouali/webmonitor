@@ -1,4 +1,4 @@
-package com.github.tzarouali.repository.config
+package webmonitor.repository.config
 
 object RepositoryConfigReader {
 

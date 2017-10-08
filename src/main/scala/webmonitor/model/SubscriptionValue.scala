@@ -1,4 +1,4 @@
-package com.github.tzarouali.model
+package webmonitor.model
 
 import java.util.UUID
 

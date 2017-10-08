@@ -1,15 +1,15 @@
-package com.github.tzarouali.repository.interpreter
+package webmonitor.repository.interpreter
 
 import cats.data.Kleisli
 import cats.effect.IO
-import com.github.tzarouali.RepoResult
-import com.github.tzarouali.model.Subscription
-import com.github.tzarouali.repository.SubscriptionRepository
-import com.github.tzarouali.repository.config.RepositoryConfigReader
 import com.outworkers.phantom.Table
 import com.outworkers.phantom.connectors.CassandraConnection
 import com.outworkers.phantom.dsl._
 import com.outworkers.phantom.keys.PartitionKey
+import webmonitor.model.Subscription
+import webmonitor.repository.SubscriptionRepository
+import webmonitor.repository.config.RepositoryConfigReader
+import webmonitor.webmonitor.RepoResult
 
 trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[RepoResult] {
 

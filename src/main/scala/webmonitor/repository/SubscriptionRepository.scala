@@ -1,8 +1,8 @@
-package com.github.tzarouali.repository
+package webmonitor.repository
 
 import java.util.UUID
 
-import com.github.tzarouali.model.Subscription
+import webmonitor.model.Subscription
 
 trait SubscriptionRepository[F[_]] {
   def findSubscriptions(userId: UUID): F[Vector[Subscription]]
