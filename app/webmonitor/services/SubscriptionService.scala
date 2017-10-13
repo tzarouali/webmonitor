@@ -1,7 +1,7 @@
-package webmonitor.service
+package webmonitor.services
 
 import cats.data.Kleisli
-import webmonitor.repository.SubscriptionRepository
+import webmonitor.repositories.SubscriptionRepository
 
 trait SubscriptionService[F[_], G[_], SUBSCRIPTION, ID] {
 

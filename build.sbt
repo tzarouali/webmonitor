@@ -1,8 +1,6 @@
 
-lazy val akkaHttpVersion = "10.0.9"
-lazy val akkaHttpCirceVersion = "1.17.0"
 lazy val catsVersion = "1.0.0-MF"
-lazy val circeVersion = "0.8.0"
+lazy val circeVersion = "0.9.0-M1"
 lazy val catsEffectVersion = "0.4"
 lazy val jsoupVersion = "1.10.3"
 lazy val phantomVersion = "2.13.5"
@@ -17,7 +15,7 @@ val strictScalacOptions = Seq(
   "-language:higherKinds",             // Allow higher-kinded types
   "-language:implicitConversions",     // Allow definition of implicit functions called views
   "-unchecked",                        // Enable additional warnings where generated code depends on assumptions.
-  "-Xfatal-warnings",                  // Fail the compilation if there are any warnings.
+//  "-Xfatal-warnings",                  // Fail the compilation if there are any warnings.
   "-Xfuture",                          // Turn on future language features.
   "-Xlint:adapted-args",               // Warn if an argument list is modified to match the receiver.
   "-Xlint:by-name-right-associative",  // By-name parameter of right associative operator.
@@ -55,21 +53,20 @@ val strictScalacOptions = Seq(
 )
 
 lazy val root = (project in file("."))
+  .enablePlugins(PlayScala)
   .settings(
     inThisBuild(List(
       organization := "com.github.tzarouali",
       scalaVersion := "2.12.3",
-      version      := "0.1.0-SNAPSHOT"
+      version      := "0.0.1"
     )),
     name := "webmonitor",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka"   %% "akka-http"              % akkaHttpVersion         withSources() withJavadoc(),
-
-      "de.heikoseeberger"   %% "akka-http-circe"        % akkaHttpCirceVersion    withSources() withJavadoc(),
-
       "io.circe"            %% "circe-core"             % circeVersion            withSources() withJavadoc(),
       "io.circe"            %% "circe-generic"          % circeVersion            withSources() withJavadoc(),
       "io.circe"            %% "circe-parser"           % circeVersion            withSources() withJavadoc(),
+
+      "com.dripower"        %% "play-circe"             % "2608.5"                withSources() withJavadoc(),
 
       "org.typelevel"       %% "cats-core"              % catsVersion             withSources() withJavadoc(),
       "org.typelevel"       %% "cats-effect"            % catsEffectVersion       withSources() withJavadoc(),

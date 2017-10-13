@@ -1,7 +1,7 @@
-package webmonitor.service
+package webmonitor.services
 
 import cats.data.Kleisli
-import webmonitor.repository.UserRepository
+import webmonitor.repositories.UserRepository
 
 trait UserService[F[_], G[_], USER, ID] {
 

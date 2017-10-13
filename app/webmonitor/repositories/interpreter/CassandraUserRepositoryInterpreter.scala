@@ -1,12 +1,12 @@
-package webmonitor.repository.interpreter
+package webmonitor.repositories.interpreter
 
 import cats.effect.IO
 import com.outworkers.phantom.Table
 import com.outworkers.phantom.connectors.CassandraConnection
 import com.outworkers.phantom.dsl._
-import webmonitor.config.ApplicationConfigReader
 import webmonitor.model.User
-import webmonitor.repository.UserRepository
+import webmonitor.repositories.UserRepository
+import webmonitor.config.ApplicationConfigReader
 
 import scala.concurrent.Future
 

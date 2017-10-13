@@ -1,4 +1,4 @@
-package webmonitor.repository
+package webmonitor.repositories
 
 trait UserRepository[F[_], G[_], USER, ID] {
   def findUser(userId: ID): F[G[Option[USER]]]

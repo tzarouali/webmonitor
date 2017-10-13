@@ -1,11 +1,11 @@
-package webmonitor.service.interpreter
+package webmonitor.services.interpreter
 
 import java.util.UUID
 
 import cats.data.Kleisli
 import cats.effect.IO
 import webmonitor.model.Subscription
-import webmonitor.service.SubscriptionService
+import webmonitor.services.SubscriptionService
 
 import scala.concurrent.Future
 
