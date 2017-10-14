@@ -1,12 +1,13 @@
 package webmonitor.services
 
 import cats.data.Kleisli
+import webmonitor.model.{LoginError, LogoutError, UserSessionData}
 import webmonitor.repositories.UserRepository
 
-trait UserService[F[_], G[_], USER, ID] {
+trait UserService[F[_], USER, ID] {
 
-  def findUser(userId: ID): Kleisli[F, UserRepository[F, G, USER, ID], G[Option[USER]]]
+  def login(email: String, password: String): Kleisli[F, UserRepository[F, USER, ID], Either[LoginError, UserSessionData]]
 
-  def createUser(user: USER): Kleisli[F, UserRepository[F, G, USER, ID], G[ID]]
+  def logout(userSessionData: UserSessionData): Kleisli[F, UserRepository[F, USER, ID], Either[LogoutError, Unit]]
 
 }

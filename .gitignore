@@ -1,3 +1,7 @@
-target/
-.idea/
-project/target
+backend/target/
+backend/.idea/
+backend/project/target
+backend/project/project/
+frontend/node_modules
+frontend/elm-stuff
+frontend/dist

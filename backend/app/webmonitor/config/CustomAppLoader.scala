@@ -28,6 +28,6 @@ class CustomAppComponents(context: ApplicationLoader.Context)
     with _root_.controllers.AssetsComponents {
 
   lazy val subscriptionController = new _root_.webmonitor.controllers.SubscriptionController(controllerComponents)
-  lazy val userController = new _root_.webmonitor.controllers.UserController(controllerComponents)
-  lazy val router: Router = new _root_.router.Routes(httpErrorHandler, userController, subscriptionController)
+  lazy val sessionController = new _root_.webmonitor.controllers.SessionController(controllerComponents)
+  lazy val router: Router = new _root_.router.Routes(httpErrorHandler, sessionController, subscriptionController)
 }
