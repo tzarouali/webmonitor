@@ -30,7 +30,7 @@ class SubscriptionController(cc: ControllerComponents) extends CustomBaseControl
       })
   }
 
-  def createNewSubscription() = Action.async(circe.json[NewSubscription]) { implicit req =>
+  def createNewSubscription() = Action.async(circe.json[NewSubscription]) { req =>
     val sub = Subscription(UUID.randomUUID(), req.body.url, req.body.jqueryExtractor, UUID.randomUUID())
     storeSubscription(sub).run(subscriptionRepo).unsafeRunSync().map(_ => Ok)
       .recover({

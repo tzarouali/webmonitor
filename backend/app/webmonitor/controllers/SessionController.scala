@@ -7,12 +7,9 @@ import io.circe.generic.semiauto._
 import io.circe.syntax._
 import play.api.mvc.ControllerComponents
 import webmonitor._
-import webmonitor.model.UserSessionData
+import webmonitor.model.{UserLogin, UserSessionData}
 import webmonitor.repositories.interpreter.CassandraUserRepositoryInterpreter
 import webmonitor.services.interpreter.UserServiceInterpreter
-
-
-case class UserLogin(email: String, password: String)
 
 class SessionController(cc: ControllerComponents) extends CustomBaseController(cc) {
 
@@ -21,7 +18,7 @@ class SessionController(cc: ControllerComponents) extends CustomBaseController(c
   implicit val sessionDataEncoder: Encoder[UserSessionData] = deriveEncoder
   implicit val userLoginDataDecoder: Decoder[UserLogin] = deriveDecoder
 
-  def login() = Action.async(circe.json[UserLogin]) { implicit req =>
+  def login() = Action.async(circe.json[UserLogin]) { req =>
     val user = req.body
     UserServiceInterpreter.login(user.email, user.password)
       .run(userRepo)

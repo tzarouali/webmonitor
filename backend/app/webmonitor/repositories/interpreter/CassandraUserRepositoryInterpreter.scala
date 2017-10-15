@@ -26,25 +26,26 @@ trait CassandraUserRepositoryInterpreter extends UserRepository[IO, User, UUID] 
     ))
   }
 
-  override def findUser(email: String, password: String): IO[Option[User]] = {
+  override def findUser(email: String): IO[Option[User]] = {
     IO.fromFuture(always(
       userTable
         .select
         .where(_.email eqs email)
-        .and(_.password eqs password)
         .allowFiltering()
         .one()
     ))
   }
 
   override def updateUserToken(userId: UUID, token: String): IO[Unit] = {
-    IO.fromFuture(always(
+    IO.fromFuture(always({
+      val theToken = if (token.nonEmpty) Some(token) else None
       userTable
         .update()
-        .modify(_.token.setTo(token))
+        .where(_.id eqs userId)
+        .modify(_.usertoken.setTo(theToken))
         .future()
         .map(_ => ())
-    ))
+    }))
   }
 
 }
@@ -64,7 +65,7 @@ object CassandraUserRepositoryInterpreter extends CassandraUserRepositoryInterpr
 
     object secret extends StringColumn
 
-    object token extends StringColumn
+    object usertoken extends OptionalStringColumn
   }
 
   val userTable = new Users
