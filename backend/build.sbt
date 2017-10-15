@@ -4,6 +4,7 @@ lazy val circeVersion = "0.9.0-M1"
 lazy val catsEffectVersion = "0.4"
 lazy val jsoupVersion = "1.10.3"
 lazy val phantomVersion = "2.13.5"
+lazy val playCirceVersion = "2608.5"
 
 val strictScalacOptions = Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
@@ -66,7 +67,7 @@ lazy val root = (project in file("."))
       "io.circe"            %% "circe-generic"          % circeVersion            withSources() withJavadoc(),
       "io.circe"            %% "circe-parser"           % circeVersion            withSources() withJavadoc(),
 
-      "com.dripower"        %% "play-circe"             % "2608.5"                withSources() withJavadoc(),
+      "com.dripower"        %% "play-circe"             % playCirceVersion        withSources() withJavadoc(),
 
       "org.typelevel"       %% "cats-core"              % catsVersion             withSources() withJavadoc(),
       "org.typelevel"       %% "cats-effect"            % catsEffectVersion       withSources() withJavadoc(),
