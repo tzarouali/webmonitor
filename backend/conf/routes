@@ -1,5 +1,5 @@
 POST        /login                        webmonitor.controllers.SessionController.login()
-POST        /logout/:userId               webmonitor.controllers.SessionController.logout(userId: java.util.UUID)
+POST        /logout                       webmonitor.controllers.SessionController.logout()
 
 GET         /subscriptions/:userId        webmonitor.controllers.SubscriptionController.getSubscriptions(userId: java.util.UUID)
 POST        /subscriptions                webmonitor.controllers.SubscriptionController.createNewSubscription()

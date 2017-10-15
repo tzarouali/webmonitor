@@ -1,7 +1,10 @@
 package webmonitor.config
 
 import play.api._
+import play.api.http.HttpErrorHandler
+import play.api.mvc.EssentialFilter
 import play.api.routing.Router
+import webmonitor.global.SecurityTokenFilter
 
 
 class CustomAppLoader extends ApplicationLoader {
@@ -27,7 +30,12 @@ class CustomAppComponents(context: ApplicationLoader.Context)
     with play.filters.HttpFiltersComponents
     with _root_.controllers.AssetsComponents {
 
+  override def httpFilters: Seq[EssentialFilter] = Vector(SecurityTokenFilter)
+
+  override lazy val httpErrorHandler: HttpErrorHandler = webmonitor.global.CustomErrorHandler
+
   lazy val subscriptionController = new _root_.webmonitor.controllers.SubscriptionController(controllerComponents)
   lazy val sessionController = new _root_.webmonitor.controllers.SessionController(controllerComponents)
+
   lazy val router: Router = new _root_.router.Routes(httpErrorHandler, sessionController, subscriptionController)
 }

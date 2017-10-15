@@ -7,7 +7,7 @@ import java.util.UUID
 import cats.data.Kleisli
 import cats.effect.IO
 import org.apache.commons.codec.digest.DigestUtils
-import webmonitor.model.{LoginError, LogoutError, User, UserSessionData}
+import webmonitor.model._
 import webmonitor.services.UserService
 
 trait UserServiceInterpreter extends UserService[IO, User, UUID] {
@@ -38,6 +38,19 @@ trait UserServiceInterpreter extends UserService[IO, User, UUID] {
       })
   }
 
+  override def userTokenMatches(userId: UUID, token: String) = Kleisli { repo =>
+    repo
+      .findUser(userId)
+      .flatMap({
+        case Some(u) =>
+          u.usertoken match {
+            case Some(t) => IO(Right(t == token))
+            case _ => IO(Right(false))
+          }
+        case _ =>
+          IO(Left(UserNotFoundError()))
+      })
+  }
 }
 
 object UserServiceInterpreter extends UserServiceInterpreter {

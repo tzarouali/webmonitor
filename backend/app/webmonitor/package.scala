@@ -1,5 +1,6 @@
 package object webmonitor {
 
-  final val TOKEN_HEADER = "X-SECURITY-HEADER"
+  final val USER_ID_HEADER = "X-USER-ID-HEADER"
+  final val TOKEN_HEADER = "X-TOKEN-HEADER"
 
 }

@@ -1,18 +1,18 @@
 package webmonitor.controllers
 
-import java.util.concurrent.ForkJoinPool
+import java.util.UUID
 
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import play.api.libs.circe.Circe
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.mvc.{AbstractController, AnyContent, ControllerComponents, Request}
+import webmonitor.{TOKEN_HEADER, USER_ID_HEADER}
+import webmonitor.global.ApplicationExecutionContext
 
-import scala.concurrent.ExecutionContext
+abstract class CustomBaseController(cc: ControllerComponents)
+  extends AbstractController(cc)
+    with ApplicationExecutionContext
+    with Circe {
 
-abstract class CustomBaseController(cc: ControllerComponents) extends AbstractController(cc) with Circe {
-
-  implicit final val system = ActorSystem()
-  implicit final val materializer = ActorMaterializer()
-  implicit final val ec = ExecutionContext.fromExecutor(new ForkJoinPool(8))
+  implicit def tokenHeader()(implicit r: Request[AnyContent]): String = r.headers.get(TOKEN_HEADER).get
+  implicit def userIdHeader()(implicit r: Request[AnyContent]): UUID = UUID.fromString(r.headers.get(USER_ID_HEADER).get)
 
 }
