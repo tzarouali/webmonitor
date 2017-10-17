@@ -7,4 +7,6 @@ trait UserRepository[F[_], USER, ID] {
   def findUser(email: String): F[Option[USER]]
 
   def updateUserToken(userId: ID, token: String): F[Unit]
+
+  def clearUserToken(userId: ID): F[Unit]
 }

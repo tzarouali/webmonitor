@@ -32,7 +32,7 @@ trait UserServiceInterpreter extends UserService[IO, User, UUID] {
       .findUser(userSessionData.userId)
       .flatMap({
         case Some(u) if u.usertoken.isDefined && u.usertoken.get == userSessionData.token =>
-          repo.updateUserToken(u.id, "").map(_ => Right(()))
+          repo.clearUserToken(u.id).map(_ => Right(()))
         case _ =>
           IO(Left(LogoutError("Error trying to logout.")))
       })

@@ -38,11 +38,21 @@ trait CassandraUserRepositoryInterpreter extends UserRepository[IO, User, UUID] 
 
   override def updateUserToken(userId: UUID, token: String): IO[Unit] = {
     IO.fromFuture(always({
-      val theToken = if (token.nonEmpty) Some(token) else None
       userTable
         .update()
         .where(_.id eqs userId)
-        .modify(_.usertoken.setTo(theToken))
+        .modify(_.usertoken.setTo(Some(token)))
+        .future()
+        .map(_ => ())
+    }))
+  }
+
+  override def clearUserToken(userId: UUID): IO[Unit] = {
+    IO.fromFuture(always({
+      userTable
+        .update()
+        .where(_.id eqs userId)
+        .modify(_.usertoken.setTo(None))
         .future()
         .map(_ => ())
     }))
