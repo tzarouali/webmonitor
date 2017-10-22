@@ -1,33 +1,46 @@
-import Html exposing (Html, button, div, text)
+module Main exposing (..)
+
+import Pages.LoginPage as LoginPage
+import Model exposing (..)
+import Msg exposing (..)
+import Html exposing (..)
 import Html.Attributes exposing (..)
+import Navigation
+
+
 main =
-  Html.program
-    { init = init
-    , update = update
-    , subscriptions = subscriptions
-    , view = view
+  Navigation.program UrlChange
+  { init = init
+  , view = view
+  , update = update
+  , subscriptions = subscriptions
+  }
+
+init : Navigation.Location -> (Model, Cmd Msg)
+init location =
+  (
+    { history = [location]
+    , userDetails = {email = Nothing, password = Nothing, token = Nothing, userId = Nothing}
+    , error = Nothing
     }
-
-
-type Model =
-    InitModel String
-
-type Msg =
-    TestMsg
-
-init : (Model, Cmd Msg)
-init = (InitModel "", Cmd.none)
+  , Cmd.none
+  )
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
-    case msg of
-        TestMsg -> (model, Cmd.none)
+  case msg of
+    UrlChange location ->
+      ( {model | history = location :: model.history}
+      , Cmd.none
+      )
+    LoginPageMsg t ->
+      LoginPage.update t model
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model = Sub.none
 
 view : Model -> Html Msg
 view model =
-    div [class "container"]
-    [ text "hello!"
-    ]
+  LoginPage.view model
+
