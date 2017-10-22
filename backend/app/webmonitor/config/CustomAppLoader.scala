@@ -4,6 +4,7 @@ import play.api._
 import play.api.http.HttpErrorHandler
 import play.api.mvc.EssentialFilter
 import play.api.routing.Router
+import play.filters.cors.CORSConfig
 import webmonitor.global.SecurityTokenFilter
 
 
@@ -28,9 +29,12 @@ class CustomAppLoader extends ApplicationLoader {
 class CustomAppComponents(context: ApplicationLoader.Context)
   extends BuiltInComponentsFromContext(context)
     with play.filters.HttpFiltersComponents
+    with play.filters.cors.CORSComponents
     with _root_.controllers.AssetsComponents {
 
-  override def httpFilters: Seq[EssentialFilter] = Vector(SecurityTokenFilter)
+  override def httpFilters: Seq[EssentialFilter] = Vector(corsFilter, SecurityTokenFilter)
+
+  override lazy val corsConfig: CORSConfig = ApplicationConfigReader.config.corsConfig
 
   override lazy val httpErrorHandler: HttpErrorHandler = webmonitor.global.CustomErrorHandler
 
