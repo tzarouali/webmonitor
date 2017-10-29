@@ -1,5 +1,6 @@
 package webmonitor.repositories.interpreter
 
+import java.time.{LocalDateTime, ZoneId}
 import java.util.UUID
 
 import cats.Eval._
@@ -7,6 +8,7 @@ import cats.effect.IO
 import com.outworkers.phantom.Table
 import com.outworkers.phantom.connectors.CassandraConnection
 import com.outworkers.phantom.dsl._
+import com.outworkers.phantom.jdk8._
 import webmonitor.config.ApplicationConfigReader
 import webmonitor.model.User
 import webmonitor.repositories.UserRepository
@@ -39,14 +41,18 @@ trait CassandraUserRepositoryInterpreter extends UserRepository[IO, User, UUID] 
   override def updateUserToken(userId: UUID, token: String): IO[Unit] = {
     IO.fromFuture(always({
       val theToken = if (token.nonEmpty) Some(token) else None
+      val expiration = if (token.nonEmpty) Some(generateExpirationDateTime) else None
       userTable
         .update()
         .where(_.id eqs userId)
         .modify(_.usertoken.setTo(theToken))
+        .and(_.tokenexpiration.setTo(expiration))
         .future()
         .map(_ => ())
     }))
   }
+
+  private val generateExpirationDateTime = LocalDateTime.now(ZoneId.of("UTC")).plusHours(1L)
 
   override def clearUserToken(userId: UUID): IO[Unit] = {
     updateUserToken(userId, "")
@@ -70,6 +76,8 @@ object CassandraUserRepositoryInterpreter extends CassandraUserRepositoryInterpr
     object secret extends StringColumn
 
     object usertoken extends OptionalStringColumn
+
+    object tokenexpiration extends OptionalCol[LocalDateTime]
   }
 
   val userTable = new Users

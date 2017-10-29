@@ -10,6 +10,6 @@ trait UserService[F[_], USER, ID] {
 
   def logout(userSessionData: UserSessionData): Kleisli[F, UserRepository[F, USER, ID], Either[LogoutError, Unit]]
 
-  def userTokenMatches(userId: ID, token: String): Kleisli[F, UserRepository[F, USER, ID], Either[UserNotFoundError, Boolean]]
+  def tokenValid(userId: ID, token: String): Kleisli[F, UserRepository[F, USER, ID], Either[UserNotFoundError, Boolean]]
 
 }

@@ -66,6 +66,7 @@ lazy val root = (project in file("."))
       "io.circe"            %% "circe-core"             % circeVersion            withSources() withJavadoc(),
       "io.circe"            %% "circe-generic"          % circeVersion            withSources() withJavadoc(),
       "io.circe"            %% "circe-parser"           % circeVersion            withSources() withJavadoc(),
+      "io.circe"            %% "circe-java8"            % circeVersion            withSources() withJavadoc(),
 
       "com.dripower"        %% "play-circe"             % playCirceVersion        withSources() withJavadoc(),
 
@@ -73,6 +74,7 @@ lazy val root = (project in file("."))
       "org.typelevel"       %% "cats-effect"            % catsEffectVersion       withSources() withJavadoc(),
 
       "com.outworkers"      %% "phantom-dsl"            % phantomVersion          withSources() withJavadoc(),
+      "com.outworkers"      %% "phantom-jdk8"           % phantomVersion          withSources() withJavadoc(),
 
       "org.jsoup"           % "jsoup"                   % jsoupVersion
     ),

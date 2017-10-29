@@ -2,6 +2,7 @@ package webmonitor.services.interpreter
 
 import java.math.BigInteger
 import java.security.SecureRandom
+import java.time.{LocalDateTime, ZoneId}
 import java.util.UUID
 
 import cats.data.Kleisli
@@ -31,26 +32,32 @@ trait UserServiceInterpreter extends UserService[IO, User, UUID] {
     repo
       .findUser(userSessionData.userId)
       .flatMap({
-        case Some(u) if u.usertoken.isDefined && u.usertoken.get == userSessionData.token =>
+        case Some(u) if u.userToken.isDefined && u.userToken.get == userSessionData.token =>
           repo.clearUserToken(u.id).map(_ => Right(()))
         case _ =>
           IO(Left(LogoutError("Error trying to logout.")))
       })
   }
 
-  override def userTokenMatches(userId: UUID, token: String) = Kleisli { repo =>
+  override def tokenValid(userId: UUID, token: String) = Kleisli { repo =>
     repo
       .findUser(userId)
       .flatMap({
         case Some(u) =>
-          u.usertoken match {
-            case Some(t) => IO(Right(t == token))
-            case _ => IO(Right(false))
+          (u.userToken, u.tokenExpiration) match {
+            case (Some(t), Some(exp)) =>
+              IO(Right(t == token && tokenNotExpired(exp)))
+            case _ =>
+              IO(Right(false))
           }
         case _ =>
           IO(Left(UserNotFoundError()))
       })
   }
+
+  private val tokenNotExpired: LocalDateTime => Boolean =
+    expirationDate => LocalDateTime.now(ZoneId.of("UTC")).isBefore(expirationDate)
+
 }
 
 object UserServiceInterpreter extends UserServiceInterpreter {

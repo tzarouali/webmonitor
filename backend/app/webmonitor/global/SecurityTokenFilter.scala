@@ -21,7 +21,7 @@ trait SecurityTokenFilter extends EssentialFilter with ApplicationExecutionConte
     if (resourceSecured(req.uri)) {
       (req.headers.get(TOKEN_HEADER), req.headers.get(USER_ID_HEADER)) match {
         case (Some(token), Some(userId)) =>
-          Accumulator.flatten(tokenMatch(userId, token).map({
+          Accumulator.flatten(tokenMatchesAndNotExpired(userId, token).map({
             case true => next(req)
             case false => unauthorized
           }))
@@ -33,12 +33,12 @@ trait SecurityTokenFilter extends EssentialFilter with ApplicationExecutionConte
     }
   }
 
-  private def tokenMatch(userId: String, token: String): Future[Boolean] = {
+  private def tokenMatchesAndNotExpired(userId: String, token: String): Future[Boolean] = {
     val userRepo = CassandraUserRepositoryInterpreter
     Validated.catchNonFatal(UUID.fromString(userId)).toEither
       .fold(
         _ => Future.successful(false),
-        uuid => userTokenMatches(uuid, token)
+        uuid => tokenValid(uuid, token)
           .run(userRepo)
           .unsafeToFuture()
           .map(_.fold(_ => false, b => b))
