@@ -48,7 +48,9 @@ view model =
           [ label [for "password"] [text "Password"]
           , input [ id "password", type_ "password", class "form-control", placeholder "Password", onInput Password] []
           ]
-        , button [ class "button", onClick LoginBtnClick] [ text "Login" ]
+        , div [style [("text-align", "center")]]
+          [ button [ class "button", onClick LoginBtnClick] [ text "Login" ]
+          ]
         , br [] []
         , generateErrorMessageLabel model
         ]
@@ -66,7 +68,7 @@ generateErrorMessageLabel model =
             EmailOrPasswordEmpty -> ("visible", "Email and password fields are required")
             FailedLogin -> ("visible", "Login error!")
   in
-    span [style [("visibility", (Tuple.first visibilityAndError)), ("color", "red")]]
+    div [style [("visibility", (Tuple.first visibilityAndError)), ("color", "red"), ("text-align", "center")]]
     [ text (Tuple.second visibilityAndError)
     ]
 
