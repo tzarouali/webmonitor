@@ -18,9 +18,10 @@ main =
     }
 
 init : Navigation.Location -> (Model, Cmd Msg)
-init location =
+init _ =
   (
-    { userDetails = {email = Nothing, password = Nothing, token = Nothing, userId = Nothing}
+    { history = []
+    , userDetails = {email = Nothing, password = Nothing, token = Nothing, userId = Nothing}
     , error = Nothing
     }
   , Cmd.none
@@ -40,4 +41,6 @@ subscriptions model = Sub.none
 
 view : Model -> Html Msg
 view model =
-  LoginPage.view model
+  AppRouter.view model
+
+

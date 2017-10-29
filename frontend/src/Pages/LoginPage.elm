@@ -7,6 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
+import Task
 import HttpBuilder as HT exposing (..)
 import Json.Encode as E exposing (string, object)
 import Json.Decode as D exposing (string, Decoder)
@@ -29,8 +30,10 @@ update msg model =
             |> updateUserId userData.userId
             |> updateUserToken userData.token
             |> updateError Nothing
+        commandLoginOkMsg =
+          Task.succeed (UrlMsg LoginOk) |> Task.perform identity
       in
-        (modelWithUserIdAndToken, Cmd.none)
+        (modelWithUserIdAndToken, commandLoginOkMsg)
     DoLogin (Err e) ->
       ({model | error = (Just (LoginError FailedLogin))}, Cmd.none)
 

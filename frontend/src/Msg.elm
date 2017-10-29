@@ -11,6 +11,7 @@ type Msg =
 
 type UrlMsgType =
     UrlChange Navigation.Location
+  | LoginOk
 
 type LoginMsgType =
     Email Email

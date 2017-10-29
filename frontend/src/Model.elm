@@ -1,10 +1,11 @@
 module Model exposing (..)
 
 import Navigation
-
+import Routes exposing (..)
 
 type alias Model =
-  { userDetails : UserDetails
+  { history : List (Maybe Route)
+  , userDetails : UserDetails
   , error : Maybe ApplicationError
   }
 
