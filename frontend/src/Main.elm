@@ -33,9 +33,8 @@ update msg model =
       ( {model | history = location :: model.history}
       , Cmd.none
       )
-    LoginPageMsg t ->
-      LoginPage.update t model
-
+    LoginPageMsg msgType ->
+      LoginPage.update msgType model
 
 subscriptions : Model -> Sub Msg
 subscriptions model = Sub.none
@@ -43,4 +42,3 @@ subscriptions model = Sub.none
 view : Model -> Html Msg
 view model =
   LoginPage.view model
-
