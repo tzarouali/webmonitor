@@ -6,8 +6,11 @@ import Navigation
 
 
 type Msg =
-    UrlChange Navigation.Location
+    UrlMsg UrlMsgType
   | LoginPageMsg LoginMsgType
+
+type UrlMsgType =
+    UrlChange Navigation.Location
 
 type LoginMsgType =
     Email Email
