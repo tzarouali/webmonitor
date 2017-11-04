@@ -17,15 +17,14 @@ trait SecurityTokenFilter extends EssentialFilter with ApplicationExecutionConte
   lazy final val UnsecuredEndpointUrls = Vector(webmonitor.controllers.routes.SessionController.login().url)
 
   override def apply(next: EssentialAction) = EssentialAction { req =>
-    val unauthorized = Accumulator.done(Unauthorized("Security headers not found."))
     if (resourceSecured(req.uri)) {
       (req.headers.get(TOKEN_HEADER), req.headers.get(USER_ID_HEADER)) match {
         case (Some(token), Some(userId)) =>
           Accumulator.flatten(tokenMatchesAndNotExpired(userId, token).map({
             case true => next(req)
-            case false => unauthorized
+            case false => Accumulator.done(Unauthorized("Authorization failed."))
           }))
-        case _ => unauthorized
+        case _ => Accumulator.done(Unauthorized("Security headers not found."))
       }
     } else {
       // accessing a non-secured endpoint

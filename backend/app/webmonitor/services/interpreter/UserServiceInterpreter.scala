@@ -22,7 +22,8 @@ trait UserServiceInterpreter extends UserService[IO, User, UUID] {
         case Some(u) if passwordsMatch(u, password) =>
           val token = generateToken()
           val sessionData = UserSessionData(u.id, token)
-          repo.updateUserToken(u.id, token).flatMap(_ => IO(Right(sessionData)))
+          val expiration = Some(LocalDateTime.now(defaultTimeZone).plusHours(1L))
+          repo.updateUserToken(u.id, token, expiration).flatMap(_ => IO(Right(sessionData)))
         case _ =>
           IO(Left(LoginError("Error trying to login. Verify your credentials.")))
       })
@@ -55,12 +56,14 @@ trait UserServiceInterpreter extends UserService[IO, User, UUID] {
       })
   }
 
-  private val tokenNotExpired: LocalDateTime => Boolean =
-    expirationDate => LocalDateTime.now(ZoneId.of("UTC")).isBefore(expirationDate)
-
 }
 
 object UserServiceInterpreter extends UserServiceInterpreter {
+
+  private val defaultTimeZone = ZoneId.of("UTC")
+
+  private val tokenNotExpired: LocalDateTime => Boolean =
+    expirationDate => LocalDateTime.now(defaultTimeZone).isBefore(expirationDate)
 
   private def generateToken(): String = {
     val random = new SecureRandom()
