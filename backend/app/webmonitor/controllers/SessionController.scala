@@ -1,6 +1,7 @@
 package webmonitor.controllers
 
 import io.circe.syntax._
+import play.api.Logger
 import play.api.mvc.ControllerComponents
 import webmonitor.model.{UserLogin, UserSessionData}
 import webmonitor.repositories.interpreter.CassandraUserRepositoryInterpreter
@@ -16,6 +17,11 @@ class SessionController(cc: ControllerComponents) extends CustomBaseController(c
       .run(userRepo)
       .unsafeToFuture()
       .map(_.fold(e => Unauthorized(e.err), s => Ok(s.asJson)))
+      .recover({
+        case e =>
+          Logger.error("Error trying to login", e)
+          InternalServerError("Error trying to login")
+      })
   }
 
   def logout() = Action.async { implicit req =>
@@ -23,6 +29,11 @@ class SessionController(cc: ControllerComponents) extends CustomBaseController(c
       .run(userRepo)
       .unsafeToFuture()
       .map(_.fold(e => Unauthorized(e.err), _ => Ok("")))
+      .recover({
+        case e =>
+          Logger.error("Error trying to logout", e)
+          InternalServerError("Error trying to logout")
+      })
   }
 
 }

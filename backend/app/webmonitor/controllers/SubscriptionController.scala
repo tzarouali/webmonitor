@@ -3,6 +3,7 @@ package webmonitor.controllers
 import java.util.UUID
 
 import io.circe.syntax._
+import play.api.Logger
 import play.api.mvc.ControllerComponents
 import webmonitor.model.{NewSubscriptionReq, Subscription}
 import webmonitor.repositories.interpreter.CassandraSubscriptionRepositoryInterpreter
@@ -18,7 +19,9 @@ class SubscriptionController(cc: ControllerComponents) extends CustomBaseControl
       .unsafeToFuture()
       .map(subscriptions => Ok(subscriptions.asJson))
       .recover({
-        case e => InternalServerError(e.getMessage)
+        case e =>
+          Logger.error("Error retrieving subscriptions", e)
+          InternalServerError("Error retrieving subscriptions")
       })
   }
 
@@ -29,7 +32,9 @@ class SubscriptionController(cc: ControllerComponents) extends CustomBaseControl
       .unsafeToFuture()
       .map(_ => Ok)
       .recover({
-        case e => InternalServerError(e.getMessage)
+        case e =>
+          Logger.error("Error storing a new subscription", e)
+          InternalServerError("Error storing subscription")
       })
   }
 }
