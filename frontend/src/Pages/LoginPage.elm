@@ -14,7 +14,7 @@ import Json.Decode as D exposing (string, Decoder)
 import Json.Decode.Pipeline as D exposing (decode, required)
 
 
-update : LoginMsgType -> Model -> (Model, Cmd Msg)
+update : LoginPageMsgType -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Email e ->
@@ -31,7 +31,7 @@ update msg model =
             |> updateUserToken userData.token
             |> updateError Nothing
         commandLoginOkMsg =
-          Task.succeed (UrlMsg LoginOk) |> Task.perform identity
+          genUrlMsgCommand ShowHome
       in
         (modelWithUserIdAndToken, commandLoginOkMsg)
     DoLogin (Err e) ->
@@ -60,7 +60,7 @@ view model =
       ]
   in Html.map LoginPageMsg html
 
-generateErrorMessageLabel : Model -> Html LoginMsgType
+generateErrorMessageLabel : Model -> Html LoginPageMsgType
 generateErrorMessageLabel model =
   let
     visibilityAndError =

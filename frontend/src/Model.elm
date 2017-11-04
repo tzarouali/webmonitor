@@ -3,6 +3,7 @@ module Model exposing (..)
 import Navigation
 import Routes exposing (..)
 
+
 type alias Model =
   { history : List (Maybe Route)
   , userDetails : UserDetails
@@ -32,7 +33,6 @@ type alias UserLoginData =
   { userId : UserId
   , token: Token
   }
-
 
 updateUserEmail : Email -> Model -> Model
 updateUserEmail email model =

@@ -1,11 +1,14 @@
 module Main exposing (..)
 
+import Pages.HomePage as HomePage
 import Pages.LoginPage as LoginPage
-import AppRouter exposing(..)
+import AppRouter exposing (..)
+import Routes exposing (..)
 import Model exposing (..)
 import Msg exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Task
 import Navigation
 
 
@@ -24,7 +27,7 @@ init _ =
     , userDetails = {email = Nothing, password = Nothing, token = Nothing, userId = Nothing}
     , error = Nothing
     }
-  , Cmd.none
+  , genUrlMsgCommand ShowLogin
   )
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -35,6 +38,9 @@ update msg model =
 
     LoginPageMsg msgType ->
       LoginPage.update msgType model
+
+    HomePageMsg msgType ->
+      HomePage.update msgType model
 
 subscriptions : Model -> Sub Msg
 subscriptions model = Sub.none
