@@ -1,10 +1,10 @@
 
-lazy val catsVersion = "1.0.0-MF"
-lazy val circeVersion = "0.9.0-M1"
-lazy val catsEffectVersion = "0.4"
+lazy val catsVersion = "1.0.0-RC1"
+lazy val circeVersion = "0.9.0-M2"
+lazy val catsEffectVersion = "0.5"
 lazy val jsoupVersion = "1.10.3"
 lazy val phantomVersion = "2.13.5"
-lazy val playCirceVersion = "2608.5"
+lazy val playCirceVersion = "2609M2.0"
 
 val strictScalacOptions = Seq(
   "-deprecation",                      // Emit warning and location for usages of deprecated APIs.

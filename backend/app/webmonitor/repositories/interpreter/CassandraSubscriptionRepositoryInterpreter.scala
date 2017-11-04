@@ -1,40 +1,41 @@
 package webmonitor.repositories.interpreter
 
+import cats.Eval.always
 import cats.effect.IO
 import com.outworkers.phantom.Table
 import com.outworkers.phantom.connectors.CassandraConnection
 import com.outworkers.phantom.dsl._
 import com.outworkers.phantom.keys.PartitionKey
+import webmonitor.config.ApplicationConfigReader
 import webmonitor.model.Subscription
 import webmonitor.repositories.SubscriptionRepository
-import webmonitor.config.ApplicationConfigReader
 
-import scala.concurrent.Future
-
-trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[IO, Future, Subscription, UUID] {
+trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[IO, Subscription, UUID] {
 
   import CassandraSubscriptionRepositoryInterpreter._
   import CassandraSubscriptionRepositoryInterpreter.subscriptionTable._
 
-  override def findSubscriptions(userId: UUID) = IO {
-    subscriptionTable
-      .select
-      .where(_.userId eqs userId)
-      .allowFiltering()
-      .fetch()
-      .map(_.toVector)
-  }
+  override def findSubscriptions(userId: UUID) =
+    IO.fromFuture(always(
+      subscriptionTable
+        .select
+        .where(_.userId eqs userId)
+        .allowFiltering()
+        .fetch()
+        .map(_.toVector)
+    ))
 
-  override def storeSubscription(subscription: Subscription) = IO {
-    subscriptionTable
-      .insert
-      .value(_.id, subscription.id)
-      .value(_.url, subscription.url)
-      .value(_.jqueryExtractor, subscription.jqueryExtractor)
-      .value(_.userId, subscription.userId)
-      .future()
-      .map(_ => ())
-  }
+  override def storeSubscription(subscription: Subscription) =
+    IO.fromFuture(always(
+      subscriptionTable
+        .insert
+        .value(_.id, subscription.id)
+        .value(_.url, subscription.url)
+        .value(_.jqueryExtractor, subscription.jqueryExtractor)
+        .value(_.userId, subscription.userId)
+        .future()
+        .map(_ => ())
+    ))
 
 }
 

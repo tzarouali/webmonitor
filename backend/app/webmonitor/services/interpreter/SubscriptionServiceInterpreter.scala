@@ -7,9 +7,7 @@ import cats.effect.IO
 import webmonitor.model.Subscription
 import webmonitor.services.SubscriptionService
 
-import scala.concurrent.Future
-
-trait SubscriptionServiceInterpreter extends SubscriptionService[IO, Future, Subscription, UUID] {
+trait SubscriptionServiceInterpreter extends SubscriptionService[IO, Subscription, UUID] {
   override def findSubscriptions(userId: UUID) = Kleisli { repo =>
     repo.findSubscriptions(userId)
   }
