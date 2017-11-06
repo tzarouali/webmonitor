@@ -2,22 +2,23 @@ package webmonitor.services.interpreter
 
 import java.math.BigInteger
 import java.security.SecureRandom
+import java.time.temporal.ChronoUnit
 import java.time.{LocalDateTime, ZoneId}
 import java.util.UUID
 
 import cats.Id
-import cats.data.{EitherT, Kleisli}
+import cats.data.{EitherT, Reader}
 import cats.effect.IO
 import org.apache.commons.codec.digest.DigestUtils
 import webmonitor.model._
 import webmonitor.services.UserService
 
-trait UserServiceInterpreter extends UserService[IO, Id, User, UUID] {
+trait UserServiceInterpreter extends UserService[IO, User, UUID] {
 
   import UserServiceInterpreter._
 
-  override def login(email: String, password: String) = Kleisli { repo =>
-    val eitherTSessionData: Id[EitherT[IO, LoginError, UserSessionData]] =
+  override def login(email: String, password: String) = Reader { repo =>
+    val userSessionData: Id[EitherT[IO, LoginError, UserSessionData]] =
     repo
       .findUser(email)
       .toRight(LoginError("Error trying to login. Verify your credentials."))
@@ -25,16 +26,16 @@ trait UserServiceInterpreter extends UserService[IO, Id, User, UUID] {
         case u if passwordsMatch(u, password) =>
           val token = generateToken()
           val sessionData = UserSessionData(u.id, token)
-          val expiration = Some(LocalDateTime.now(defaultTimeZone).plusHours(1L))
+          val expiration = Some(LocalDateTime.now(defaultTimeZone).plus(defaultExpirationTime, defaultExpirationUnit))
           EitherT.right(repo.updateUserToken(u.id, token, expiration).flatMap(_ => IO(sessionData)))
         case _ =>
           EitherT.left(IO(LoginError("Error trying to login. Verify your credentials.")))
       }
-    eitherTSessionData
+    userSessionData
   }
 
-  override def logout(userSessionData: UserSessionData) = Kleisli { repo =>
-    val eitherTUnit: Id[EitherT[IO, LogoutError, Unit]] =
+  override def logout(userSessionData: UserSessionData) = Reader { repo =>
+    val logoutResult: Id[EitherT[IO, LogoutError, Unit]] =
       repo
         .findUser(userSessionData.userId)
         .toRight(LogoutError("Error trying to logout."))
@@ -44,11 +45,11 @@ trait UserServiceInterpreter extends UserService[IO, Id, User, UUID] {
           case _ =>
             EitherT.left(IO(LogoutError("Error trying to logout.")))
         }
-    eitherTUnit
+    logoutResult
   }
 
-  override def tokenValid(userId: UUID, token: String) = Kleisli { repo =>
-    val eitherTBoolean: Id[EitherT[IO, UserNotFoundError, Boolean]] =
+  override def tokenValid(userId: UUID, token: String) = Reader { repo =>
+    val tokenValid: Id[EitherT[IO, UserNotFoundError, Boolean]] =
       repo
         .findUser(userId)
         .toRight(UserNotFoundError())
@@ -60,12 +61,15 @@ trait UserServiceInterpreter extends UserService[IO, Id, User, UUID] {
               EitherT.right(IO(false))
           }
         }
-    eitherTBoolean
+    tokenValid
   }
 
 }
 
 object UserServiceInterpreter extends UserServiceInterpreter {
+
+  private val defaultExpirationTime = 1L
+  private val defaultExpirationUnit = ChronoUnit.HOURS
 
   private val defaultTimeZone = ZoneId.of("UTC")
 

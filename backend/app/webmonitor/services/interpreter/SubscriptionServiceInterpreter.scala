@@ -3,7 +3,7 @@ package webmonitor.services.interpreter
 import java.util.UUID
 
 import cats.Id
-import cats.data.{EitherT, Kleisli}
+import cats.data.{EitherT, Kleisli, Reader}
 import cats.effect.IO
 import org.jsoup.Jsoup
 import webmonitor.model.{Subscription, SubscriptionNotFound, SubscriptionValue}
@@ -18,7 +18,7 @@ trait SubscriptionServiceInterpreter extends SubscriptionService[IO, Id, UUID, S
     repo.storeSubscription(subscription)
   }
 
-  override def getSubscriptionValue(subscriptionId: UUID) = Kleisli { repo =>
+  override def getSubscriptionValue(subscriptionId: UUID) = Reader { repo =>
     val subscriptionValue: Id[EitherT[IO, SubscriptionNotFound, SubscriptionValue]] = repo
       .getSubscription(subscriptionId)
       .toRight(SubscriptionNotFound())

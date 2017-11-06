@@ -16,7 +16,6 @@ class SubscriptionController(cc: ControllerComponents) extends CustomBaseControl
 
   val subscriptionRepo = CassandraSubscriptionRepositoryInterpreter
 
-
   def getSubscriptions() = Action.async { implicit req =>
     findSubscriptions(userIdHeader)
       .run(subscriptionRepo)
