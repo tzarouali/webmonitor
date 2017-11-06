@@ -5,55 +5,62 @@ import java.security.SecureRandom
 import java.time.{LocalDateTime, ZoneId}
 import java.util.UUID
 
-import cats.data.Kleisli
+import cats.Id
+import cats.data.{EitherT, Kleisli}
 import cats.effect.IO
 import org.apache.commons.codec.digest.DigestUtils
 import webmonitor.model._
 import webmonitor.services.UserService
 
-trait UserServiceInterpreter extends UserService[IO, User, UUID] {
+trait UserServiceInterpreter extends UserService[IO, Id, User, UUID] {
 
   import UserServiceInterpreter._
 
   override def login(email: String, password: String) = Kleisli { repo =>
+    val eitherTSessionData: Id[EitherT[IO, LoginError, UserSessionData]] =
     repo
       .findUser(email)
-      .flatMap({
-        case Some(u) if passwordsMatch(u, password) =>
+      .toRight(LoginError("Error trying to login. Verify your credentials."))
+      .flatMap {
+        case u if passwordsMatch(u, password) =>
           val token = generateToken()
           val sessionData = UserSessionData(u.id, token)
           val expiration = Some(LocalDateTime.now(defaultTimeZone).plusHours(1L))
-          repo.updateUserToken(u.id, token, expiration).flatMap(_ => IO(Right(sessionData)))
+          EitherT.right(repo.updateUserToken(u.id, token, expiration).flatMap(_ => IO(sessionData)))
         case _ =>
-          IO(Left(LoginError("Error trying to login. Verify your credentials.")))
-      })
+          EitherT.left(IO(LoginError("Error trying to login. Verify your credentials.")))
+      }
+    eitherTSessionData
   }
 
   override def logout(userSessionData: UserSessionData) = Kleisli { repo =>
-    repo
-      .findUser(userSessionData.userId)
-      .flatMap({
-        case Some(u) if u.userToken.isDefined && u.userToken.get == userSessionData.token =>
-          repo.clearUserToken(u.id).map(_ => Right(()))
-        case _ =>
-          IO(Left(LogoutError("Error trying to logout.")))
-      })
+    val eitherTUnit: Id[EitherT[IO, LogoutError, Unit]] =
+      repo
+        .findUser(userSessionData.userId)
+        .toRight(LogoutError("Error trying to logout."))
+        .flatMap {
+          case u if u.userToken.get == userSessionData.token =>
+            EitherT.right(repo.clearUserToken(u.id).map(_ => ()))
+          case _ =>
+            EitherT.left(IO(LogoutError("Error trying to logout.")))
+        }
+    eitherTUnit
   }
 
   override def tokenValid(userId: UUID, token: String) = Kleisli { repo =>
-    repo
-      .findUser(userId)
-      .flatMap({
-        case Some(u) =>
+    val eitherTBoolean: Id[EitherT[IO, UserNotFoundError, Boolean]] =
+      repo
+        .findUser(userId)
+        .toRight(UserNotFoundError())
+        .flatMap { u =>
           (u.userToken, u.tokenExpiration) match {
             case (Some(t), Some(exp)) =>
-              IO(Right(t == token && tokenNotExpired(exp)))
+              EitherT.right(IO(t == token && tokenNotExpired(exp)))
             case _ =>
-              IO(Right(false))
+              EitherT.right(IO(false))
           }
-        case _ =>
-          IO(Left(UserNotFoundError()))
-      })
+        }
+    eitherTBoolean
   }
 
 }

@@ -39,6 +39,7 @@ trait SecurityTokenFilter extends EssentialFilter with ApplicationExecutionConte
         _ => Future.successful(false),
         uuid => tokenValid(uuid, token)
           .run(userRepo)
+          .value
           .unsafeToFuture()
           .map(_.fold(_ => false, b => b))
       )

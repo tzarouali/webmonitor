@@ -1,6 +1,7 @@
 package webmonitor.repositories.interpreter
 
 import cats.Eval.always
+import cats.data.OptionT
 import cats.effect.IO
 import com.outworkers.phantom.Table
 import com.outworkers.phantom.connectors.CassandraConnection
@@ -15,7 +16,7 @@ trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[
   import CassandraSubscriptionRepositoryInterpreter._
   import CassandraSubscriptionRepositoryInterpreter.subscriptionTable._
 
-  override def findSubscriptions(userId: UUID) =
+  override def findSubscriptions(userId: UUID): IO[Vector[Subscription]] =
     IO.fromFuture(always(
       subscriptionTable
         .select
@@ -25,7 +26,7 @@ trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[
         .map(_.toVector)
     ))
 
-  override def storeSubscription(subscription: Subscription) =
+  override def storeSubscription(subscription: Subscription): IO[Unit] =
     IO.fromFuture(always(
       subscriptionTable
         .insert
@@ -37,6 +38,15 @@ trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[
         .map(_ => ())
     ))
 
+  override def getSubscription(subscriptionId: UUID): OptionT[IO, Subscription] =
+    OptionT(
+      IO.fromFuture(always(
+        subscriptionTable
+          .select
+          .where(_.id eqs subscriptionId)
+          .one()
+      ))
+    )
 }
 
 object CassandraSubscriptionRepositoryInterpreter extends CassandraSubscriptionRepositoryInterpreter {

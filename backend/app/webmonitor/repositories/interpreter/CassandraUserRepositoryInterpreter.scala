@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 import cats.Eval._
+import cats.data.OptionT
 import cats.effect.IO
 import com.outworkers.phantom.Table
 import com.outworkers.phantom.connectors.CassandraConnection
@@ -18,24 +19,28 @@ trait CassandraUserRepositoryInterpreter extends UserRepository[IO, User, UUID] 
   import CassandraUserRepositoryInterpreter._
   import CassandraUserRepositoryInterpreter.userTable._
 
-  override def findUser(userId: UUID): IO[Option[User]] = {
-    IO.fromFuture(always(
-      userTable
-        .select
-        .where(_.id eqs userId)
-        .allowFiltering()
-        .one()
-    ))
+  override def findUser(userId: UUID): OptionT[IO, User] = {
+    OptionT(
+      IO.fromFuture(always(
+        userTable
+          .select
+          .where(_.id eqs userId)
+          .allowFiltering()
+          .one()
+      ))
+    )
   }
 
-  override def findUser(email: String): IO[Option[User]] = {
-    IO.fromFuture(always(
-      userTable
-        .select
-        .where(_.email eqs email)
-        .allowFiltering()
-        .one()
-    ))
+  override def findUser(email: String): OptionT[IO, User] = {
+    OptionT(
+      IO.fromFuture(always(
+        userTable
+          .select
+          .where(_.email eqs email)
+          .allowFiltering()
+          .one()
+      ))
+    )
   }
 
   override def updateUserToken(userId: UUID, token: String, tokenExpiration: Option[LocalDateTime]): IO[Unit] = {

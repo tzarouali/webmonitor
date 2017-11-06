@@ -15,6 +15,7 @@ class SessionController(cc: ControllerComponents) extends CustomBaseController(c
     val user = req.body
     UserServiceInterpreter.login(user.email, user.password)
       .run(userRepo)
+      .value
       .unsafeToFuture()
       .map(_.fold(e => Unauthorized(e.err), s => Ok(s.asJson)))
       .recover({
@@ -27,6 +28,7 @@ class SessionController(cc: ControllerComponents) extends CustomBaseController(c
   def logout() = Action.async { implicit req =>
     UserServiceInterpreter.logout(UserSessionData(userIdHeader, tokenHeader))
       .run(userRepo)
+      .value
       .unsafeToFuture()
       .map(_.fold(e => Unauthorized(e.err), _ => Ok("")))
       .recover({

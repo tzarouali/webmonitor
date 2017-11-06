@@ -3,5 +3,4 @@ package webmonitor.model
 import java.util.UUID
 
 case class SubscriptionValue(subscriptionId: UUID,
-                             userId: UUID,
-                             value: String)
+                             value: String) extends Product with Serializable
