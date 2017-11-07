@@ -9,7 +9,7 @@ import org.jsoup.Jsoup
 import webmonitor.model.{Subscription, SubscriptionNotFound, SubscriptionValue}
 import webmonitor.services.SubscriptionService
 
-trait SubscriptionServiceInterpreter extends SubscriptionService[IO, Id, UUID, Subscription, SubscriptionValue] {
+trait SubscriptionServiceInterpreter extends SubscriptionService[IO, UUID, Subscription, SubscriptionValue] {
   override def findSubscriptions(userId: UUID) = Kleisli { repo =>
     repo.findSubscriptions(userId)
   }

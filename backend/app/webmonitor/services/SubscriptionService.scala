@@ -4,7 +4,7 @@ import cats.data.{EitherT, Kleisli, Reader}
 import webmonitor.model.SubscriptionNotFound
 import webmonitor.repositories.SubscriptionRepository
 
-trait SubscriptionService[F[_], G[_], ID, SUBSCRIPTION, SUBSCRIPTION_VALUE] {
+trait SubscriptionService[F[_], ID, SUBSCRIPTION, SUBSCRIPTION_VALUE] {
 
   def findSubscriptions(userId: ID): Kleisli[F, SubscriptionRepository[F, SUBSCRIPTION, ID], Vector[SUBSCRIPTION]]
 

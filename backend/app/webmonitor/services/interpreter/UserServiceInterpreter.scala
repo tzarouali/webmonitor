@@ -29,7 +29,7 @@ trait UserServiceInterpreter extends UserService[IO, User, UUID] {
           val expiration = Some(LocalDateTime.now(defaultTimeZone).plus(defaultExpirationTime, defaultExpirationUnit))
           EitherT.right(repo.updateUserToken(u.id, token, expiration).flatMap(_ => IO(sessionData)))
         case _ =>
-          EitherT.left(IO(LoginError("Error trying to login. Verify your credentials.")))
+          EitherT.leftT(LoginError("Error trying to login. Verify your credentials."))
       }
     userSessionData
   }
@@ -43,7 +43,7 @@ trait UserServiceInterpreter extends UserService[IO, User, UUID] {
           case u if u.userToken.get == userSessionData.token =>
             EitherT.right(repo.clearUserToken(u.id).map(_ => ()))
           case _ =>
-            EitherT.left(IO(LogoutError("Error trying to logout.")))
+            EitherT.leftT(LogoutError("Error trying to logout."))
         }
     logoutResult
   }
@@ -56,9 +56,9 @@ trait UserServiceInterpreter extends UserService[IO, User, UUID] {
         .flatMap { u =>
           (u.userToken, u.tokenExpiration) match {
             case (Some(t), Some(exp)) =>
-              EitherT.right(IO(t == token && tokenNotExpired(exp)))
+              EitherT.rightT(t == token && tokenNotExpired(exp))
             case _ =>
-              EitherT.right(IO(false))
+              EitherT.rightT(false)
           }
         }
     tokenValid
