@@ -49,7 +49,7 @@ trait CassandraUserRepositoryInterpreter extends UserRepository[IO, User, UUID] 
       userTable
         .update()
         .where(_.id eqs userId)
-        .modify(_.usertoken.setTo(theToken))
+        .modify(_.userToken.setTo(theToken))
         .and(_.tokenexpiration.setTo(tokenExpiration))
         .future()
         .map(_ => ())
@@ -77,9 +77,14 @@ object CassandraUserRepositoryInterpreter extends CassandraUserRepositoryInterpr
 
     object secret extends StringColumn
 
-    object usertoken extends OptionalStringColumn
+    object userToken extends OptionalStringColumn {
+      override def name: String = "user_token"
+    }
 
-    object tokenexpiration extends OptionalCol[LocalDateTime]
+    object tokenexpiration extends OptionalCol[LocalDateTime] {
+      override def name: String = "token_expiration"
+    }
+
   }
 
   val userTable = new Users

@@ -40,6 +40,7 @@ class CustomAppComponents(context: ApplicationLoader.Context)
 
   lazy val subscriptionController = new _root_.webmonitor.controllers.SubscriptionController(controllerComponents)
   lazy val sessionController = new _root_.webmonitor.controllers.SessionController(controllerComponents)
+  lazy val subscriptionFeedWebSocketController = new _root_.webmonitor.controllers.SubscriptionFeedWebSocketController(controllerComponents)
 
-  lazy val router: Router = new _root_.router.Routes(httpErrorHandler, sessionController, subscriptionController)
+  lazy val router: Router = new _root_.router.Routes(httpErrorHandler, sessionController, subscriptionController, subscriptionFeedWebSocketController)
 }

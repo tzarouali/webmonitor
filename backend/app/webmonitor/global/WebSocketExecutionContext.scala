@@ -7,7 +7,7 @@ import akka.stream.ActorMaterializer
 
 import scala.concurrent.ExecutionContext
 
-trait ApplicationExecutionContext {
+trait WebSocketExecutionContext {
 
   implicit final val system = ActorSystem()
   implicit final val materializer = ActorMaterializer()

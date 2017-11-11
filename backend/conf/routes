@@ -5,4 +5,4 @@ GET         /api/subscriptions             webmonitor.controllers.SubscriptionCo
 POST        /api/subscriptions             webmonitor.controllers.SubscriptionController.createNewSubscription()
 
 
-GET         /api/subscriptions/flow        webmonitor.controllers.SubscriptionController.websocketTest
+GET         /api/subscriptionFeed/:subscriptionId        webmonitor.controllers.SubscriptionFeedWebSocketController.getSubscriptionFeedValue(subscriptionId: String)

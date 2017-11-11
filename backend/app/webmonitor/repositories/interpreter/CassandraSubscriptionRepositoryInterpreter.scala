@@ -6,7 +6,6 @@ import cats.effect.IO
 import com.outworkers.phantom.Table
 import com.outworkers.phantom.connectors.CassandraConnection
 import com.outworkers.phantom.dsl._
-import com.outworkers.phantom.keys.PartitionKey
 import webmonitor.config.ApplicationConfigReader
 import webmonitor.model.Subscription
 import webmonitor.repositories.SubscriptionRepository
@@ -58,9 +57,13 @@ object CassandraSubscriptionRepositoryInterpreter extends CassandraSubscriptionR
 
     object url extends StringColumn
 
-    object jqueryExtractor extends StringColumn
+    object jqueryExtractor extends StringColumn {
+      override def name: String = "jquery_extractor"
+    }
 
-    object userId extends UUIDColumn with PartitionKey
+    object userId extends UUIDColumn with PartitionKey {
+      override def name: String = "user_id"
+    }
 
   }
 

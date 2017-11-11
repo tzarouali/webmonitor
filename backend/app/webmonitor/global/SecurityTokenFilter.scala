@@ -8,16 +8,14 @@ import play.api.mvc.Results._
 import play.api.mvc.{EssentialAction, EssentialFilter}
 import webmonitor._
 import webmonitor.repositories.interpreter.CassandraUserRepositoryInterpreter
-import webmonitor.services.interpreter.UserServiceInterpreter._
+import webmonitor.services.interpreter.UserServiceInterpreter
 
 import scala.concurrent.Future
 
 trait SecurityTokenFilter extends EssentialFilter with ApplicationExecutionContext {
 
-  lazy final val UnsecuredEndpointUrls = Vector(webmonitor.controllers.routes.SessionController.login().url)
-
   override def apply(next: EssentialAction) = EssentialAction { req =>
-    if (resourceSecured(req.uri)) {
+    if (securedRestfulEndpoint(req.uri)) {
       (req.headers.get(TOKEN_HEADER), req.headers.get(USER_ID_HEADER)) match {
         case (Some(token), Some(userId)) =>
           Accumulator.flatten(tokenMatchesAndNotExpired(userId, token).map({
@@ -37,7 +35,7 @@ trait SecurityTokenFilter extends EssentialFilter with ApplicationExecutionConte
     Validated.catchNonFatal(UUID.fromString(userId)).toEither
       .fold(
         _ => Future.successful(false),
-        uuid => tokenValid(uuid, token)
+        uuid => UserServiceInterpreter.tokenValid(uuid, token)
           .run(userRepo)
           .value
           .unsafeToFuture()
@@ -45,9 +43,9 @@ trait SecurityTokenFilter extends EssentialFilter with ApplicationExecutionConte
       )
   }
 
-  private def resourceSecured(endpointUri: String): Boolean = {
-    !UnsecuredEndpointUrls.contains(endpointUri)
-  }
+  private def securedRestfulEndpoint(endpointUri: String): Boolean =
+    !SecuredApplicationUrls.unsecuredEndpointUrls.contains(endpointUri)
+
 }
 
 object SecurityTokenFilter extends SecurityTokenFilter
