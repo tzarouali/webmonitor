@@ -19,6 +19,8 @@ import scala.language.postfixOps
 
 class SubscriptionFeedWebSocketController(cc: ControllerComponents) extends CustomBaseWebSocketController(cc) {
 
+  import webmonitor.global.WebSocketExecutionContext._
+
   val subscriptionFeedRepo = CassandraSubscriptionFeedRepositoryInterpreter
 
   implicit val jsonMessageFlowTransformer: MessageFlowTransformer[String, Json] = {
@@ -29,8 +31,12 @@ class SubscriptionFeedWebSocketController(cc: ControllerComponents) extends Cust
           Right(CloseMessage(
             Some(CloseCodes.Unacceptable),
             "This WebSocket only supports text frames"))
-      })(flow.map(asd => TextMessage.apply(asd.toString())))
+      })(flow.map(json => TextMessage.apply(json.toString())))
     }
+  }
+
+  def rootPath() = Action {
+    Ok("")
   }
 
   def getSubscriptionFeedValue(subscriptionId: String) = securedWebsocket { _ =>

@@ -5,14 +5,14 @@ import java.util.UUID
 import io.circe.syntax._
 import play.api.Logger
 import play.api.mvc._
-import webmonitor.global.ApplicationExecutionContext
 import webmonitor.model.{NewSubscriptionReq, Subscription}
 import webmonitor.repositories.interpreter.CassandraSubscriptionRepositoryInterpreter
 import webmonitor.services.interpreter.SubscriptionServiceInterpreter
 
 class SubscriptionController(cc: ControllerComponents)
-  extends CustomBaseController(cc)
-    with ApplicationExecutionContext {
+  extends CustomBaseController(cc) {
+
+  import webmonitor.global.ApplicationExecutionContext._
 
   val subscriptionRepo = CassandraSubscriptionRepositoryInterpreter
 

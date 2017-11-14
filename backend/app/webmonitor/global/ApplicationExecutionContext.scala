@@ -7,7 +7,7 @@ import akka.stream.ActorMaterializer
 
 import scala.concurrent.ExecutionContext
 
-trait ApplicationExecutionContext {
+object ApplicationExecutionContext {
 
   implicit final val system = ActorSystem()
   implicit final val materializer = ActorMaterializer()

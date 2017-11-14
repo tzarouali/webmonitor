@@ -12,10 +12,15 @@ import webmonitor.services.interpreter.UserServiceInterpreter
 
 import scala.concurrent.Future
 
-trait SecurityTokenFilter extends EssentialFilter with ApplicationExecutionContext {
+trait SecurityTokenFilter extends EssentialFilter {
+
+  lazy final val unsecuredEndpointUrls = Vector(webmonitor.controllers.routes.SessionController.login().path())
+  lazy final val securedWebSocketEndpointUrls = Vector(webmonitor.controllers.routes.SubscriptionFeedWebSocketController.rootPath().url)
+
+  import webmonitor.global.ApplicationExecutionContext._
 
   override def apply(next: EssentialAction) = EssentialAction { req =>
-    if (securedRestfulEndpoint(req.uri)) {
+    if (securedRestfulEndpoint(req.path)) {
       (req.headers.get(TOKEN_HEADER), req.headers.get(USER_ID_HEADER)) match {
         case (Some(token), Some(userId)) =>
           Accumulator.flatten(tokenMatchesAndNotExpired(userId, token).map({
@@ -43,8 +48,14 @@ trait SecurityTokenFilter extends EssentialFilter with ApplicationExecutionConte
       )
   }
 
-  private def securedRestfulEndpoint(endpointUri: String): Boolean =
-    !SecuredApplicationUrls.unsecuredEndpointUrls.contains(endpointUri)
+  private def securedRestfulEndpoint(endpointPath: String): Boolean =
+    notUnsecuredRequest(endpointPath) && notWebSocketRequest(endpointPath)
+
+  private def notUnsecuredRequest(endpointPath: String): Boolean =
+    !unsecuredEndpointUrls.contains(endpointPath)
+
+  private def notWebSocketRequest(endpointPath: String): Boolean =
+    !securedWebSocketEndpointUrls.exists(endpointPath.startsWith)
 
 }
 
