@@ -4,6 +4,5 @@ POST        /api/logout                                         webmonitor.contr
 GET         /api/subscriptions                                  webmonitor.controllers.SubscriptionController.getSubscriptions
 POST        /api/subscriptions                                  webmonitor.controllers.SubscriptionController.createNewSubscription()
 
-
 GET         /api/socket                                         webmonitor.controllers.SubscriptionFeedWebSocketController.rootPath()
 GET         /api/socket/subscriptionFeed/:subscriptionId        webmonitor.controllers.SubscriptionFeedWebSocketController.getSubscriptionFeedValue(subscriptionId: String)

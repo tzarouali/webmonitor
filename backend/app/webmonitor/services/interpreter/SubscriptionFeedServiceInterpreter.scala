@@ -15,6 +15,11 @@ trait SubscriptionFeedServiceInterpreter extends SubscriptionFeedService[IO, UUI
         .getSubscriptionFeedValue(subscriptionId)
         .toRight(SubscriptionFeedValueNotFound())
     }
+
+  override def storeSubscriptionFeedValue(subscriptionId: UUID, subscriptionValue: SubscriptionValue): Reader[SubscriptionFeedRepository[IO, SubscriptionValue, UUID], IO[Unit]] =
+    Reader { repo =>
+      repo.storeSubscriptionFeedValue(subscriptionId, subscriptionValue)
+    }
 }
 
 object SubscriptionFeedServiceInterpreter extends SubscriptionFeedServiceInterpreter

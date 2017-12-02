@@ -2,13 +2,14 @@ package webmonitor.services.interpreter
 
 import java.math.BigInteger
 import java.security.SecureRandom
+import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.time.{LocalDateTime, ZoneId}
 import java.util.UUID
 
 import cats.data.{EitherT, Reader}
 import cats.effect.IO
 import org.apache.commons.codec.digest.DigestUtils
+import webmonitor.config.ApplicationConfigReader
 import webmonitor.model._
 import webmonitor.repositories.UserRepository
 import webmonitor.services.UserService
@@ -26,6 +27,7 @@ trait UserServiceInterpreter extends UserService[IO, User, UUID] {
           case u if passwordsMatch(u, password) =>
             val token = generateToken()
             val sessionData = UserSessionData(u.id, token)
+            val defaultTimeZone = ApplicationConfigReader.config.constants.defaultTimeZone
             val expiration = Some(LocalDateTime.now(defaultTimeZone).plus(defaultExpirationTime, defaultExpirationUnit))
             EitherT.right(repo.updateUserToken(u.id, token, expiration).flatMap(_ => IO(sessionData)))
           case _ =>
@@ -67,10 +69,8 @@ object UserServiceInterpreter extends UserServiceInterpreter {
   private val defaultExpirationTime = 1L
   private val defaultExpirationUnit = ChronoUnit.HOURS
 
-  private val defaultTimeZone = ZoneId.of("UTC")
-
   private val tokenNotExpired: LocalDateTime => Boolean =
-    expirationDate => LocalDateTime.now(defaultTimeZone).isBefore(expirationDate)
+    expirationDate => LocalDateTime.now(ApplicationConfigReader.config.constants.defaultTimeZone).isBefore(expirationDate)
 
   private def generateToken(): String = {
     val random = new SecureRandom()

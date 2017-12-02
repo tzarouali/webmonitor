@@ -15,6 +15,14 @@ trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[
   import CassandraSubscriptionRepositoryInterpreter._
   import CassandraSubscriptionRepositoryInterpreter.subscriptionTable._
 
+  override def findAllSubscriptions(): IO[Vector[Subscription]] =
+    IO.fromFuture(always(
+      subscriptionTable
+        .select
+        .fetch()
+        .map(_.toVector)
+    ))
+
   override def findSubscriptions(userId: UUID): IO[Vector[Subscription]] =
     IO.fromFuture(always(
       subscriptionTable

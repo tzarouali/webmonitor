@@ -6,6 +6,7 @@ import play.api.mvc.EssentialFilter
 import play.api.routing.Router
 import play.filters.cors.CORSConfig
 import webmonitor.global.SecurityTokenFilter
+import webmonitor.tasks.SubscriptionFeedReaderTask
 
 
 class CustomAppLoader extends ApplicationLoader {
@@ -15,6 +16,7 @@ class CustomAppLoader extends ApplicationLoader {
     val appenv = readEnvironment()
     println(s"Server configured for environment $appenv")
     components = new CustomAppComponents(context)
+    startTasks()
     components.application
   }
 
@@ -22,6 +24,10 @@ class CustomAppLoader extends ApplicationLoader {
     case Some(name) if name == LocalApplicationConfig.envName => name
     case Some(_) => sys.error("Environment not recognized!")
     case _ => sys.error("No environment available!")
+  }
+
+  def startTasks(): Unit = {
+    SubscriptionFeedReaderTask.schedule()
   }
 
 }

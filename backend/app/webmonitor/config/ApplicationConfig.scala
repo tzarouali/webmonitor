@@ -1,5 +1,7 @@
 package webmonitor.config
 
+import java.time.ZoneId
+
 import com.outworkers.phantom.connectors.{CassandraConnection, ContactPoint}
 import play.filters.cors.CORSConfig
 
@@ -12,6 +14,7 @@ sealed trait ApplicationConfig {
   val dbName: String
   val cassandraKeySpace: CassandraConnection
   val corsConfig: play.filters.cors.CORSConfig
+  val constants = Constants
 }
 
 case object LocalApplicationConfig extends ApplicationConfig {
@@ -22,4 +25,9 @@ case object LocalApplicationConfig extends ApplicationConfig {
     .withOriginsAllowed(_ => true)
     .withHeadersAllowed( _ => true)
     .withMethodsAllowed(_ => true)
+}
+
+object Constants {
+  final val defaultTimeZone = ZoneId.of("UTC")
+  final val maxParallelTasks = 10
 }

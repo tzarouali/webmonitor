@@ -1,12 +1,14 @@
 package webmonitor.services
 
-import cats.data.Kleisli
+import cats.data.Reader
 import webmonitor.repositories.SubscriptionRepository
 
 trait SubscriptionService[F[_], ID, SUBSCRIPTION, SUBSCRIPTION_VALUE] {
 
-  def findSubscriptions(userId: ID): Kleisli[F, SubscriptionRepository[F, SUBSCRIPTION, ID], Vector[SUBSCRIPTION]]
+  def findAllSubscriptions(): Reader[SubscriptionRepository[F, SUBSCRIPTION, ID], F[Vector[SUBSCRIPTION]]]
 
-  def storeSubscription(subscription: SUBSCRIPTION): Kleisli[F, SubscriptionRepository[F, SUBSCRIPTION, ID], Unit]
+  def findSubscriptions(userId: ID): Reader[SubscriptionRepository[F, SUBSCRIPTION, ID], F[Vector[SUBSCRIPTION]]]
+
+  def storeSubscription(subscription: SUBSCRIPTION): Reader[SubscriptionRepository[F, SUBSCRIPTION, ID], F[Unit]]
 
 }

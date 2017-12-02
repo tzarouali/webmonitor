@@ -30,6 +30,18 @@ trait CassandraSubscriptionFeedRepositoryInterpreter extends SubscriptionFeedRep
       ))
     )
 
+  override def storeSubscriptionFeedValue(subscriptionId: UUID, value: SubscriptionValue): IO[Unit] = {
+    IO.fromFuture(always(
+      subscriptionFeedTable
+        .insert
+        .value(_.id, value.id)
+        .value(_.subscriptionId, value.subscriptionId)
+        .value(_.value, value.value)
+        .value(_.lastUpdated, value.lastUpdated)
+        .future()
+        .map(_ => ())
+    ))
+  }
 }
 
 object CassandraSubscriptionFeedRepositoryInterpreter extends CassandraSubscriptionFeedRepositoryInterpreter {
