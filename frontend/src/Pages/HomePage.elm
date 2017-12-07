@@ -38,7 +38,7 @@ generateSubscriptionHtml model =
 
 renderSubscription : UserSubscription -> Html HomePageMsgType
 renderSubscription s =
-  div [class "col-md-1", style [("background", "#aabbcc"), ("text-align", "center")]]
+  div [class "col-md-2", style [("background", "#aabbcc"), ("text-align", "center"), ("margin", "3px")]]
   [ text s.name
   , br [] []
   , text "Last Value:"
