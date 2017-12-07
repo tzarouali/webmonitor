@@ -2,12 +2,15 @@ module Model exposing (..)
 
 import Navigation
 import Routes exposing (..)
+import Date exposing (..)
 
 
 type alias Model =
   { history : List (Maybe Route)
   , userDetails : UserDetails
-  , error : Maybe ApplicationError
+  , subscriptions : List UserSubscription
+  , loginPageError : Maybe LoginPageError
+  , homePageError : Maybe HomePageError
   }
 
 type alias Email = String
@@ -22,16 +25,37 @@ type alias UserDetails =
   , userId : Maybe String
   }
 
-type ApplicationError =
-  LoginError LoginErrorType
+type LoginPageError =
+    LoginPageError LoginPageErrorType
 
-type LoginErrorType =
+type LoginPageErrorType =
     EmailOrPasswordEmpty
   | FailedLogin
+
+type HomePageError =
+  HomePageError HomePageErrorType
+
+type HomePageErrorType =
+  LoadingSubscriptionsError
 
 type alias UserLoginData =
   { userId : UserId
   , token: Token
+  }
+
+type alias UserSubscription =
+  { id : String
+  , url : String
+  , jqueryExtractor : String
+  , userId : String
+  , name : String
+  , data : Maybe SubscriptionValue
+  }
+
+type alias SubscriptionValue =
+  { subId : String
+  , value : String
+  , lastUpdated : Date
   }
 
 updateUserEmail : Email -> Model -> Model
@@ -66,6 +90,10 @@ updateUserId userId model =
   in
     {model | userDetails = detailsWithUserId}
 
-updateError : Maybe ApplicationError -> Model -> Model
-updateError maybeError model =
-  {model | error = maybeError}
+updateLoginPageError : Maybe LoginPageError -> Model -> Model
+updateLoginPageError maybeError model =
+  {model | loginPageError = maybeError}
+
+updateHomePageError : Maybe HomePageError -> Model -> Model
+updateHomePageError maybeError model =
+  {model | homePageError = maybeError}

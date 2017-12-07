@@ -25,6 +25,7 @@ trait CassandraSubscriptionFeedRepositoryInterpreter extends SubscriptionFeedRep
         subscriptionFeedTable
           .select
           .where(_.subscriptionId eqs subscriptionId)
+          .orderBy(_.lastUpdated.desc)
           .allowFiltering()
           .one()
       ))
@@ -51,7 +52,7 @@ object CassandraSubscriptionFeedRepositoryInterpreter extends CassandraSubscript
 
     override def tableName: String = "subscription_feed_values"
 
-    object id extends UUIDColumn with PartitionKey
+    object id extends UUIDColumn
 
     object subscriptionId extends UUIDColumn with PartitionKey {
       override def name: String = "subscription_id"

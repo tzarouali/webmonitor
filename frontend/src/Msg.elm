@@ -20,11 +20,19 @@ type LoginPageMsgType =
     Email Email
   | Password String
   | LoginBtnClick
-  | DoLogin (Result Http.Error UserLoginData)
+  | HttpPostLogin (Result Http.Error UserLoginData)
 
 type HomePageMsgType =
-  Hello
+    LoadSubscriptions
+  | RefreshSingleSubscription
+  | NewSubscriptionValue String
+  | RetrieveSubscriptionDetail String
+  | HttpGetSubscriptions (Result Http.Error (List UserSubscription))
 
 genUrlMsgCommand : UrlMsgType -> Cmd Msg
 genUrlMsgCommand msgType =
   Task.succeed (UrlMsg msgType) |> Task.perform identity
+
+genHomeMsgCommand : HomePageMsgType -> Cmd Msg
+genHomeMsgCommand msgType =
+  Task.succeed (HomePageMsg msgType) |> Task.perform identity

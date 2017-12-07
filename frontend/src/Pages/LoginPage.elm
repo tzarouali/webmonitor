@@ -23,19 +23,19 @@ update msg model =
       (model |> updateUserPassword p, Cmd.none)
     LoginBtnClick ->
       login model
-    DoLogin (Ok userData) ->
+    HttpPostLogin (Ok userData) ->
       let
         modelWithUserIdAndToken =
           model
             |> updateUserId userData.userId
             |> updateUserToken userData.token
-            |> updateError Nothing
+            |> updateLoginPageError Nothing
         commandLoginOkMsg =
           genUrlMsgCommand ShowHome
       in
         (modelWithUserIdAndToken, commandLoginOkMsg)
-    DoLogin (Err e) ->
-      ({model | error = (Just (LoginError FailedLogin))}, Cmd.none)
+    HttpPostLogin (Err e) ->
+      ({model | loginPageError = (Just (LoginPageError FailedLogin))}, Cmd.none)
 
 view : Model -> Html Msg
 view model =
@@ -64,9 +64,9 @@ generateErrorMessageLabel : Model -> Html LoginPageMsgType
 generateErrorMessageLabel model =
   let
     visibilityAndError =
-      case model.error of
+      case model.loginPageError of
         Nothing -> ("hidden", "")
-        Just (LoginError e) ->
+        Just (LoginPageError e) ->
           case e of
             EmailOrPasswordEmpty -> ("visible", "Email and password fields are required")
             FailedLogin -> ("visible", "Login error!")
@@ -84,11 +84,11 @@ login model =
         passEmpty = String.isEmpty (String.trim p)
       in
         if (userEmpty || passEmpty) then
-          ({model | error = (Just (LoginError EmailOrPasswordEmpty))}, Cmd.none)
+          ({model | loginPageError = (Just (LoginPageError EmailOrPasswordEmpty))}, Cmd.none)
         else
           makeLoginHttpRequest model e p
     _ ->
-      ({model | error = (Just (LoginError EmailOrPasswordEmpty))}, Cmd.none)
+      ({model | loginPageError = (Just (LoginPageError EmailOrPasswordEmpty))}, Cmd.none)
 
 makeLoginHttpRequest : Model -> Email -> Password -> (Model, Cmd Msg)
 makeLoginHttpRequest m e p =
@@ -97,7 +97,7 @@ makeLoginHttpRequest m e p =
     req = HT.post S.loginUri
           |> HT.withExpect (Http.expectJson loginDecoder)
           |> HT.withJsonBody jsonBody
-    cmd = Http.send DoLogin (HT.toRequest req)
+    cmd = Http.send HttpPostLogin (HT.toRequest req)
   in
     (m, Cmd.map LoginPageMsg cmd)
 

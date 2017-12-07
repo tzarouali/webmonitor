@@ -42,18 +42,19 @@ class SubscriptionFeedWebSocketController(cc: ControllerComponents) extends Cust
   def getSubscriptionFeedValue(subscriptionId: String) = securedWebsocket { _ =>
     val id = UUID.fromString(subscriptionId)
 
-    val subscriptionFeedValue = SubscriptionFeedServiceInterpreter.getSubscriptionFeedValue(id)
-      .run(subscriptionFeedRepo)
-      .value
-      .unsafeToFuture()
-      .map {
-        case Left(_) =>
-          SubscriptionValueNotAvailable(id, "No data available").asJson
-        case Right(subscriptionValue) =>
-          subscriptionValue.asJson
-      }
-
-    val valueFeed = Source.fromFuture(subscriptionFeedValue).flatMapConcat(Source.tick(0 second, 2 second, _))
+    val valueFeed = Source.tick(0 second, 2 second, 1)
+      .mapAsync(1)(_ => {
+        SubscriptionFeedServiceInterpreter.getSubscriptionFeedValue(id)
+          .run(subscriptionFeedRepo)
+          .value
+          .unsafeToFuture()
+          .map {
+            case Left(_) =>
+              SubscriptionValueNotAvailable(id, "No data available").asJson
+            case Right(subscriptionValue) =>
+              subscriptionValue.asJson
+          }
+      })
 
     Future(Right(Flow.fromSinkAndSource(Sink.ignore, valueFeed)))
   }

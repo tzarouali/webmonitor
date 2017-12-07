@@ -25,7 +25,9 @@ init _ =
   (
     { history = []
     , userDetails = {email = Nothing, password = Nothing, token = Nothing, userId = Nothing}
-    , error = Nothing
+    , subscriptions = []
+    , loginPageError = Nothing
+    , homePageError = Nothing
     }
   , genUrlMsgCommand ShowLogin
   )
@@ -43,7 +45,8 @@ update msg model =
       HomePage.update msgType model
 
 subscriptions : Model -> Sub Msg
-subscriptions model = Sub.none
+subscriptions model =
+  Sub.batch (HomePage.subscriptions model)
 
 view : Model -> Html Msg
 view model =

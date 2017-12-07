@@ -73,6 +73,7 @@ object CassandraSubscriptionRepositoryInterpreter extends CassandraSubscriptionR
       override def name: String = "user_id"
     }
 
+    object name extends StringColumn
   }
 
   val subscriptionTable = new Subscriptions

@@ -21,24 +21,24 @@ class SubscriptionController(cc: ControllerComponents)
       .run(subscriptionRepo)
       .unsafeToFuture()
       .map(subscriptions => Ok(subscriptions.asJson))
-      .recover({
+      .recover {
         case e =>
           Logger.error("Error retrieving subscriptions", e)
           InternalServerError("Error retrieving subscriptions")
-      })
+      }
   }
 
   def createNewSubscription() = Action.async(circe.json[NewSubscriptionReq]) { req =>
-    val sub = Subscription(UUID.randomUUID(), req.body.url, req.body.jqueryExtractor, UUID.randomUUID())
+    val sub = Subscription(UUID.randomUUID(), req.body.url, req.body.jqueryExtractor, UUID.randomUUID(), req.body.name)
     SubscriptionServiceInterpreter.storeSubscription(sub)
       .run(subscriptionRepo)
       .unsafeToFuture()
       .map(_ => Ok)
-      .recover({
+      .recover {
         case e =>
           Logger.error("Error storing a new subscription", e)
           InternalServerError("Error storing subscription")
-      })
+      }
   }
 
 }
