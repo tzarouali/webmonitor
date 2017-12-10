@@ -35,8 +35,7 @@ generateSubscriptionHtml model =
       div [style [("font-size", "20px"), ("background", "red")]]
       [text "No subscriptions available!"]
     ss ->
-      div [class "col-md-12"]
-      (List.map (\s -> renderSubscription s) ss)
+      div [class "col-md-12"] <| List.map renderSubscription ss
 
 renderSubscription : UserSubscription -> Html HomePageMsgType
 renderSubscription s =
@@ -52,8 +51,8 @@ renderSubscription s =
   , text (Maybe.withDefault "" (s.data |> Maybe.andThen (\d -> Just (DF.format "%Y-%m-%d %H:%M:%S" d.lastUpdated))))
   , br [] []
   , div [class "form-horizontal,row"]
-    [ button [ class "button", onClick RefreshSingleSubscription] [ text "Refresh" ]
-    , button [ class "button", onClick (RetrieveSubscriptionDetail s.id)] [ text "Details" ]
+    [ button [ class "btn btn-default", onClick RefreshSingleSubscription] [ text "Refresh" ]
+    , button [ class "btn btn-default", onClick (RetrieveSubscriptionDetail s.id)] [ text "Details" ]
     ]
   ]
 

@@ -53,7 +53,7 @@ view model =
           , input [ id "password", type_ "password", class "form-control", placeholder "Password", onInput Password] []
           ]
         , div [style [("text-align", "center")]]
-          [ button [ class "button", onClick LoginBtnClick] [ text "Login" ]
+          [ button [ class "btn btn-default", onClick LoginBtnClick] [ text "Login" ]
           ]
         , br [] []
         , generateErrorMessageLabel model
