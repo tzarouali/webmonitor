@@ -85,10 +85,11 @@ updateSubscription model newSocketString =
             let
               newS = {s | data = parseSubscriptionValueFromString newSocketString}
               subsUpdated = [newS] ++ (Tuple.second parts)
+              sortedSubs = List.sortBy .name subsUpdated
             in
-              {model | subscriptions = subsUpdated}
+              {model | subscriptions = sortedSubs}
           _ ->
-            {model | subscriptions = Tuple.second parts}
+            model
     _ ->
       model
 
