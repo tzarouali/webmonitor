@@ -13,17 +13,16 @@ import Navigation
 
 
 main =
-    Navigation.program (\ location -> UrlMsg (UrlChange location))
-    { init = init
-    , view = view
-    , update = update
-    , subscriptions = subscriptions
-    }
+  Navigation.program (\ location -> UrlMsg (UrlChange location))
+  { init = init
+  , view = view
+  , update = update
+  , subscriptions = subscriptions
+  }
 
 init : Navigation.Location -> (Model, Cmd Msg)
 init _ =
-  (
-    { history = []
+  ({ history = []
     , userDetails = {email = Nothing, password = Nothing, token = Nothing, userId = Nothing}
     , subscriptions = []
     , loginPageError = Nothing

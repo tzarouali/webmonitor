@@ -12,6 +12,7 @@ import HttpBuilder as HT exposing (..)
 import Json.Encode as E exposing (string, object)
 import Json.Decode as D exposing (string, Decoder)
 import Json.Decode.Pipeline as D exposing (decode, required)
+import Uuid as U exposing (..)
 
 
 update : LoginPageMsgType -> Model -> (Model, Cmd Msg)
@@ -104,5 +105,5 @@ makeLoginHttpRequest m e p =
 loginDecoder : D.Decoder UserLoginData
 loginDecoder =
   D.decode UserLoginData
-    |> D.required "userId" D.string
+    |> D.required "userId" U.decoder
     |> D.required "token" D.string

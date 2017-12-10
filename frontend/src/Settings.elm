@@ -1,5 +1,9 @@
 module Settings exposing(..)
 
+import Model exposing (..)
+import Uuid as U exposing (..)
+
+
 tokenHeaderName = "X-TOKEN-HEADER"
 userIdHeaderName = "X-USER-ID-HEADER"
 
@@ -11,6 +15,12 @@ logoutUri = baseApiUri ++ "/logout"
 
 subscriptionsUri = baseApiUri ++ "/subscriptions"
 
-subscriptionSocketUri : String -> String -> String -> String
+subscriptionSocketUri : SubscriptionId -> UserId -> Token -> String
 subscriptionSocketUri subId userId token =
-  baseSocketApiUri ++ "/socket/subscriptionFeed/" ++ subId ++ "?u=" ++ userId ++ "&t=" ++ token
+  baseSocketApiUri
+    ++ "/socket/subscriptionFeed/"
+    ++ (U.toString subId)
+    ++ "?u="
+    ++ (U.toString userId)
+    ++ "&t="
+    ++ token

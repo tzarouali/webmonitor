@@ -3,6 +3,7 @@ module Model exposing (..)
 import Navigation
 import Routes exposing (..)
 import Date exposing (..)
+import Uuid exposing (..)
 
 
 type alias Model =
@@ -16,13 +17,14 @@ type alias Model =
 type alias Email = String
 type alias Password = String
 type alias Token = String
-type alias UserId = String
+type alias UserId = Uuid
+type alias SubscriptionId = Uuid
 
 type alias UserDetails =
   { email : Maybe Email
   , password : Maybe Password
   , token : Maybe Token
-  , userId : Maybe String
+  , userId : Maybe UserId
   }
 
 type LoginPageError =
@@ -44,16 +46,16 @@ type alias UserLoginData =
   }
 
 type alias UserSubscription =
-  { id : String
+  { id : SubscriptionId
   , url : String
   , jqueryExtractor : String
-  , userId : String
+  , userId : UserId
   , name : String
   , data : Maybe SubscriptionValue
   }
 
 type alias SubscriptionValue =
-  { subId : String
+  { subId : SubscriptionId
   , value : String
   , lastUpdated : Date
   }

@@ -9,6 +9,7 @@ import Pages.HomePage as HomePage
 import Html exposing(..)
 import Routes as R exposing (..)
 
+
 route : P.Parser (Route -> a) a
 route =
   P.oneOf
@@ -46,4 +47,3 @@ view model =
           LoginPage.view model
     _ ->
       LoginPage.view model
-

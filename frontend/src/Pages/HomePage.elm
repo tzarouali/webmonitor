@@ -13,6 +13,8 @@ import HttpBuilder as HT exposing (..)
 import WebSocket
 import Date exposing (..)
 import Date.Format as DF exposing (..)
+import Uuid as U exposing (..)
+import Maybe.Extra as ME exposing (..)
 
 
 view : Model -> Html Msg
@@ -91,19 +93,15 @@ updateSubscription model newSocketString =
     _ ->
       model
 
-parseSubscriptionIdFromSocketMsg : String -> Maybe String
+parseSubscriptionIdFromSocketMsg : String -> Maybe Uuid
 parseSubscriptionIdFromSocketMsg socketMessage =
-  case D.decodeString (D.field "subscriptionId" D.string) socketMessage of
-    Ok subscriptionId ->
-      Just subscriptionId
-    _ ->
-      Nothing
+  D.decodeString (D.field "subscriptionId" U.decoder) socketMessage |> Result.toMaybe
 
 parseSubscriptionValueFromString : String -> Maybe SubscriptionValue
 parseSubscriptionValueFromString socketMessage =
   let
     subId =
-      D.decodeString (D.field "subscriptionId" D.string) socketMessage
+      D.decodeString (D.field "subscriptionId" U.decoder) socketMessage
     subValue =
       D.decodeString (D.field "value" D.string) socketMessage
     subUpdatedDate =
@@ -118,10 +116,12 @@ parseSubscriptionValueFromString socketMessage =
 retrieveSubscriptions : Model -> (Model, Cmd Msg)
 retrieveSubscriptions model =
   let
+    maybeToken = model.userDetails.token
+    maybeUserId = Maybe.map U.toString model.userDetails.userId
     req = HT.get S.subscriptionsUri
           |> HT.withExpect (Http.expectJson subscriptionsDecoder)
-          |> HT.withHeader S.tokenHeaderName (Maybe.withDefault "" model.userDetails.token)
-          |> HT.withHeader S.userIdHeaderName (Maybe.withDefault "" model.userDetails.userId)
+          |> HT.withHeader S.tokenHeaderName (Maybe.withDefault "" maybeToken)
+          |> HT.withHeader S.userIdHeaderName (Maybe.withDefault "" maybeUserId)
     cmd = Http.send HttpGetSubscriptions (HT.toRequest req)
   in
     (model, Cmd.map HomePageMsg cmd)
@@ -131,10 +131,10 @@ subscriptionsDecoder =
   let
     subDecoder =
       D.decode UserSubscription
-        |> D.required "id" D.string
+        |> D.required "id" U.decoder
         |> D.required "url" D.string
         |> D.required "jqueryExtractor" D.string
-        |> D.required "userId" D.string
+        |> D.required "userId" U.decoder
         |> D.required "name" D.string
         |> D.hardcoded Nothing
   in
@@ -146,12 +146,14 @@ subscriptions model =
     [] ->
       [Sub.map HomePageMsg Sub.none]
     ss ->
-      List.map (\s ->
-        let
-          userId = Maybe.withDefault "" model.userDetails.userId
-          token = Maybe.withDefault "" model.userDetails.token
-          socketUri = S.subscriptionSocketUri s.id userId token
-          wsResult = WebSocket.listen socketUri NewSubscriptionValue
-        in
-          Sub.map HomePageMsg wsResult
-        ) ss
+      case (model.userDetails.token, model.userDetails.userId) of
+        (Just token, Just userId) ->
+          List.map (\s ->
+            let
+              socketUri = S.subscriptionSocketUri s.id userId token
+              wsResult = WebSocket.listen socketUri NewSubscriptionValue
+            in
+              Sub.map HomePageMsg wsResult
+            ) ss
+        _ ->
+          []

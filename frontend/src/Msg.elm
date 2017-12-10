@@ -18,7 +18,7 @@ type UrlMsgType =
 
 type LoginPageMsgType =
     Email Email
-  | Password String
+  | Password Password
   | LoginBtnClick
   | HttpPostLogin (Result Http.Error UserLoginData)
 
@@ -26,7 +26,7 @@ type HomePageMsgType =
     LoadSubscriptions
   | RefreshSingleSubscription
   | NewSubscriptionValue String
-  | RetrieveSubscriptionDetail String
+  | RetrieveSubscriptionDetail SubscriptionId
   | HttpGetSubscriptions (Result Http.Error (List UserSubscription))
 
 genUrlMsgCommand : UrlMsgType -> Cmd Msg
