@@ -32,7 +32,7 @@ generateSubscriptionHtml : Model -> Html HomePageMsgType
 generateSubscriptionHtml model =
   case model.subscriptions of
     [] ->
-      div [style [("font-size", "20px"), ("background", "red")]]
+      div [style [("font-size", "20px"), ("background", "red"), ("text-align", "center")]]
       [text "No subscriptions available!"]
     ss ->
       div [class "col-md-12"] <| List.map renderSubscription ss
