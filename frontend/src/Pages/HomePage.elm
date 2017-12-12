@@ -39,22 +39,39 @@ generateSubscriptionHtml model =
 
 renderSubscription : UserSubscription -> Html HomePageMsgType
 renderSubscription s =
-  div [class "col-md-3", style [("background", "#aabbcc"), ("text-align", "center"), ("margin", "3px")]]
-  [ text s.name
-  , br [] []
-  , text "Last Value:"
-  , br [] []
-  , text (Maybe.withDefault "" (s.data |> Maybe.andThen (\d -> Just d.value)))
-  , br [] []
-  , text "Last updated:"
-  , br [] []
-  , text (Maybe.withDefault "" (s.data |> Maybe.andThen (\d -> Just (DF.format "%Y-%m-%d %H:%M:%S" d.lastUpdated))))
-  , br [] []
-  , div [class "form-horizontal,row"]
-    [ button [ class "btn btn-default", onClick RefreshSingleSubscription] [ text "Refresh" ]
-    , button [ class "btn btn-default", onClick (RetrieveSubscriptionDetail s.id)] [ text "Details" ]
+  let
+    colorClass = Maybe.map (\d -> if d.changed then "backgroundAnimated" else "") s.data
+      |> Maybe.withDefault ""
+  in
+    div [class "col-md-3", style [("background", "#aabbcc"), ("text-align", "center"), ("margin", "3px")]]
+    [ span [style [("font-weight", "bold")]]
+      [text s.name
+      ]
+    , br [] []
+    , span [style [("font-weight", "bold")]]
+      [text "Last Value:"
+      ]
+    , br [] []
+    , div []
+      [ span [class colorClass]
+        [text (Maybe.withDefault "" (s.data |> Maybe.andThen (\d -> Just d.value)))
+        ]
+      ]
+    , br [] []
+    , span [style [("font-weight", "bold")]]
+      [text "Last updated:"
+      ]
+    , br [] []
+    , div []
+      [ span [class colorClass]
+        [text (Maybe.withDefault "" (s.data |> Maybe.andThen (\d -> Just (DF.format "%Y-%m-%d %H:%M:%S" d.lastUpdated))))]
+        ]
+    , br [] []
+    , div [class "form-horizontal,row"]
+      [ button [ class "btn btn-default", onClick RefreshSingleSubscription] [ text "Refresh" ]
+      , button [ class "btn btn-default", onClick (RetrieveSubscriptionDetail s.id)] [ text "Details" ]
+      ]
     ]
-  ]
 
 update : HomePageMsgType -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -83,7 +100,7 @@ updateSubscription model newSocketString =
         case subToUpdate of
           Just s ->
             let
-              newS = {s | data = parseSubscriptionValueFromString newSocketString}
+              newS = {s | data = parseSubscriptionValueFromString s.data newSocketString}
               subsUpdated = [newS] ++ (Tuple.second parts)
               sortedSubs = List.sortBy .name subsUpdated
             in
@@ -97,8 +114,8 @@ parseSubscriptionIdFromSocketMsg : String -> Maybe Uuid
 parseSubscriptionIdFromSocketMsg socketMessage =
   D.decodeString (D.field "subscriptionId" U.decoder) socketMessage |> Result.toMaybe
 
-parseSubscriptionValueFromString : String -> Maybe SubscriptionValue
-parseSubscriptionValueFromString socketMessage =
+parseSubscriptionValueFromString : Maybe SubscriptionValue -> String -> Maybe SubscriptionValue
+parseSubscriptionValueFromString prevData socketMessage =
   let
     subId =
       D.decodeString (D.field "subscriptionId" U.decoder) socketMessage
@@ -109,7 +126,13 @@ parseSubscriptionValueFromString socketMessage =
   in
     case (subId, subValue, subUpdatedDate) of
       (Ok subId, Ok value, Ok date) ->
-        Just ({subId = subId, value = value, lastUpdated = date})
+        let
+          changed = ME.unwrap True (\d -> d.value /= value) prevData
+        in
+          Just ({subId = subId
+                , value = value
+                , lastUpdated = date
+                , changed = changed})
       _ ->
         Nothing
 

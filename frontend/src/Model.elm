@@ -58,6 +58,7 @@ type alias SubscriptionValue =
   { subId : SubscriptionId
   , value : String
   , lastUpdated : Date
+  , changed : Bool
   }
 
 updateUserEmail : Email -> Model -> Model
