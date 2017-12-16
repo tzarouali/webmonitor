@@ -51,7 +51,7 @@ trait SubscriptionFeedReaderTask extends Task {
 
   def readSubscriptionValue(subscription: Subscription): String = {
     val doc = Jsoup.connect(subscription.url).ignoreContentType(true).ignoreHttpErrors(true).get()
-    doc.select(subscription.jqueryExtractor).html()
+    doc.select(subscription.cssSelector).html()
   }
 
 }

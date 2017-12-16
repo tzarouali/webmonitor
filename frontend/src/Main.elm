@@ -50,5 +50,3 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
   AppRouter.view model
-
-

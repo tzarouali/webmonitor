@@ -1,14 +1,12 @@
 .backgroundAnimated {
-    background: '#aabbcc';
-    animation: color-me-in 1s;
+  background: '#aabbcc';
+  animation: color-me-in 1s;
 }
 
 @keyframes color-me-in {
-  /* You could think of as "step 1" */
   0% {
     background: orange;
   }
-  /* You could think of as "step 2" */
   100% {
     background: orange;
   }

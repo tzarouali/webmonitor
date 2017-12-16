@@ -156,7 +156,7 @@ subscriptionsDecoder =
       D.decode UserSubscription
         |> D.required "id" U.decoder
         |> D.required "url" D.string
-        |> D.required "jqueryExtractor" D.string
+        |> D.required "cssSelector" D.string
         |> D.required "userId" U.decoder
         |> D.required "name" D.string
         |> D.hardcoded Nothing

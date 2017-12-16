@@ -67,13 +67,13 @@ object CassandraUserRepositoryInterpreter extends CassandraUserRepositoryInterpr
 
   class Users extends Table[Users, User] with connector.Connector {
 
-    object id extends UUIDColumn with PrimaryKey
+    object id extends UUIDColumn with PartitionKey
 
     object name extends StringColumn
 
     object email extends StringColumn with PartitionKey
 
-    object password extends StringColumn with PartitionKey
+    object password extends StringColumn
 
     object secret extends StringColumn
 

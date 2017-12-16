@@ -39,7 +39,7 @@ trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[
         .insert
         .value(_.id, subscription.id)
         .value(_.url, subscription.url)
-        .value(_.jqueryExtractor, subscription.jqueryExtractor)
+        .value(_.cssSelector, subscription.cssSelector)
         .value(_.userId, subscription.userId)
         .future()
         .map(_ => ())
@@ -61,12 +61,12 @@ object CassandraSubscriptionRepositoryInterpreter extends CassandraSubscriptionR
 
   class Subscriptions extends Table[Subscriptions, Subscription] with connector.Connector {
 
-    object id extends UUIDColumn with PrimaryKey
+    object id extends UUIDColumn with PartitionKey
 
     object url extends StringColumn
 
-    object jqueryExtractor extends StringColumn {
-      override def name: String = "jquery_extractor"
+    object cssSelector extends StringColumn {
+      override def name: String = "css_selector"
     }
 
     object userId extends UUIDColumn with PartitionKey {
@@ -74,6 +74,7 @@ object CassandraSubscriptionRepositoryInterpreter extends CassandraSubscriptionR
     }
 
     object name extends StringColumn
+
   }
 
   val subscriptionTable = new Subscriptions

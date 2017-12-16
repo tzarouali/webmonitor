@@ -48,7 +48,7 @@ type alias UserLoginData =
 type alias UserSubscription =
   { id : SubscriptionId
   , url : String
-  , jqueryExtractor : String
+  , cssSelector : String
   , userId : UserId
   , name : String
   , data : Maybe SubscriptionValue
