@@ -1,5 +1,7 @@
 package webmonitor.repositories.interpreter
 
+import java.util.UUID
+
 import cats.Eval.always
 import cats.data.OptionT
 import cats.effect.IO
@@ -38,9 +40,11 @@ trait CassandraSubscriptionRepositoryInterpreter extends SubscriptionRepository[
       subscriptionTable
         .insert
         .value(_.id, subscription.id)
+        .value(_.name, subscription.name)
+        .value(_.userId, subscription.userId)
         .value(_.url, subscription.url)
         .value(_.cssSelector, subscription.cssSelector)
-        .value(_.userId, subscription.userId)
+        .value(_.useHtmlExtractor, subscription.useHtmlExtractor)
         .future()
         .map(_ => ())
     ))
@@ -63,17 +67,21 @@ object CassandraSubscriptionRepositoryInterpreter extends CassandraSubscriptionR
 
     object id extends UUIDColumn with PartitionKey
 
+    object name extends StringColumn
+
+    object userId extends UUIDColumn with PartitionKey {
+      override def name: String = "user_id"
+    }
+
     object url extends StringColumn
 
     object cssSelector extends StringColumn {
       override def name: String = "css_selector"
     }
 
-    object userId extends UUIDColumn with PartitionKey {
-      override def name: String = "user_id"
+    object useHtmlExtractor extends BooleanColumn {
+      override def name: String = "use_html_extractor"
     }
-
-    object name extends StringColumn
 
   }
 

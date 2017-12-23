@@ -28,8 +28,15 @@ class SubscriptionController(cc: ControllerComponents)
       }
   }
 
-  def createNewSubscription() = Action.async(circe.json[NewSubscriptionReq]) { req =>
-    val sub = Subscription(UUID.randomUUID(), req.body.url, req.body.cssSelector, UUID.randomUUID(), req.body.name)
+  def createNewSubscription() = Action.async(circe.json[NewSubscriptionReq]) { implicit req =>
+    val sub = Subscription(
+      UUID.randomUUID(),
+      req.body.name,
+      userIdHeader,
+      req.body.url,
+      req.body.cssSelector,
+      req.body.useHtmlExtractor
+    )
     SubscriptionServiceInterpreter.storeSubscription(sub)
       .run(subscriptionRepo)
       .unsafeToFuture()
