@@ -7,11 +7,25 @@ import Uuid exposing (..)
 
 
 type alias Model =
-  { history : List (Maybe Route)
-  , userDetails : UserDetails
+  { commonModel : CommonModel
+  , loginPageModel : LoginPageModel
+  , homePageModel : HomePageModel
+  }
+
+type alias CommonModel =
+  { routeHistory : List (Maybe Route)
+  , userSession : UserSession
+  }
+
+type alias LoginPageModel =
+  { loginPageError : Maybe LoginPageError
+  , email : Maybe Email
+  , password : Maybe Password
+  }
+
+type alias HomePageModel =
+  { homePageError : Maybe HomePageError
   , subscriptions : List UserSubscription
-  , loginPageError : Maybe LoginPageError
-  , homePageError : Maybe HomePageError
   }
 
 type alias Email = String
@@ -20,10 +34,8 @@ type alias Token = String
 type alias UserId = Uuid
 type alias SubscriptionId = Uuid
 
-type alias UserDetails =
-  { email : Maybe Email
-  , password : Maybe Password
-  , token : Maybe Token
+type alias UserSession =
+  { token : Maybe Token
   , userId : Maybe UserId
   }
 
@@ -61,42 +73,98 @@ type alias SubscriptionValue =
   , changed : Bool
   }
 
+initModel : Model
+initModel =
+  { commonModel = initCommonModel
+  , loginPageModel = initLoginPageModel
+  , homePageModel = initHomePageModel
+  }
+
+initCommonModel : CommonModel
+initCommonModel =
+  { routeHistory = []
+  , userSession = { token = Nothing
+                  , userId = Nothing
+                  }
+  }
+
+initLoginPageModel : LoginPageModel
+initLoginPageModel =
+  { loginPageError = Nothing
+  , email = Nothing
+  , password = Nothing
+  }
+
+initHomePageModel : HomePageModel
+initHomePageModel =
+  { homePageError = Nothing
+  , subscriptions = []
+  }
+
+updateRouteHistory : List (Maybe Route) -> Model -> Model
+updateRouteHistory routes model =
+  let
+    commonModel = model.commonModel
+    updatedCommonModel = {commonModel | routeHistory = routes}
+  in
+    {model | commonModel = updatedCommonModel}
+
 updateUserEmail : Email -> Model -> Model
 updateUserEmail email model =
   let
-    userDetails = model.userDetails
-    detailsWithEmail = {userDetails | email = Just email}
+    loginPageModel = model.loginPageModel
+    updatedLoginPageModel = {loginPageModel | email = Just email}
   in
-    {model | userDetails = detailsWithEmail}
+    {model | loginPageModel = updatedLoginPageModel}
 
 updateUserPassword : Password -> Model -> Model
 updateUserPassword pass model =
   let
-    userDetails = model.userDetails
-    detailsWithPassword = {userDetails | password = Just pass}
+    loginPageModel = model.loginPageModel
+    updatedLoginPageModel = {loginPageModel | password = Just pass}
   in
-    {model | userDetails = detailsWithPassword}
+    {model | loginPageModel = updatedLoginPageModel}
 
 updateUserToken : Token -> Model -> Model
 updateUserToken token model =
   let
-    userDetails = model.userDetails
-    detailsWithToken = {userDetails | token = Just token}
+    commonModel = model.commonModel
+    userSession = commonModel.userSession
+    sessionWithToken = {userSession | token = Just token}
+    updatedCommonModel = {commonModel | userSession = sessionWithToken}
   in
-    {model | userDetails = detailsWithToken}
+    {model | commonModel = updatedCommonModel}
 
 updateUserId : UserId -> Model -> Model
 updateUserId userId model =
   let
-    userDetails = model.userDetails
-    detailsWithUserId = {userDetails | userId = Just userId}
+    commonModel = model.commonModel
+    userSession = commonModel.userSession
+    sessionWithUserId = {userSession | userId = Just userId}
+    updatedCommonModel = {commonModel | userSession = sessionWithUserId}
   in
-    {model | userDetails = detailsWithUserId}
+    {model | commonModel = updatedCommonModel}
 
 updateLoginPageError : Maybe LoginPageError -> Model -> Model
 updateLoginPageError maybeError model =
-  {model | loginPageError = maybeError}
+  let
+    loginPageModel = model.loginPageModel
+    updatedLoginPageModel = {loginPageModel | loginPageError = maybeError}
+  in
+    {model | loginPageModel = updatedLoginPageModel}
 
 updateHomePageError : Maybe HomePageError -> Model -> Model
 updateHomePageError maybeError model =
-  {model | homePageError = maybeError}
+  let
+    homePageModel = model.homePageModel
+    updatedHomePageModel = {homePageModel | homePageError = maybeError}
+  in
+    {model | homePageModel = updatedHomePageModel}
+
+updateUserSubscriptions : List UserSubscription -> Model -> Model
+updateUserSubscriptions ss model =
+  let
+    homePageModel = model.homePageModel
+    updatedHomePageModel = {homePageModel | subscriptions = ss}
+  in
+    {model | homePageModel = updatedHomePageModel}

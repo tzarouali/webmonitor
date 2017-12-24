@@ -2,7 +2,7 @@ module Pages.LoginPage exposing (view, update)
 
 import Msg exposing (..)
 import Model exposing (..)
-import Settings as S exposing (..)
+import RestApiSettings as S exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -36,7 +36,7 @@ update msg model =
       in
         (modelWithUserIdAndToken, commandLoginOkMsg)
     HttpPostLogin (Err e) ->
-      ({model | loginPageError = (Just (LoginPageError FailedLogin))}, Cmd.none)
+      (model |> updateLoginPageError (Just (LoginPageError FailedLogin)), Cmd.none)
 
 view : Model -> Html Msg
 view model =
@@ -65,7 +65,7 @@ generateErrorMessageLabel : Model -> Html LoginPageMsgType
 generateErrorMessageLabel model =
   let
     visibilityAndError =
-      case model.loginPageError of
+      case model.loginPageModel.loginPageError of
         Nothing -> ("hidden", "")
         Just (LoginPageError e) ->
           case e of
@@ -78,18 +78,18 @@ generateErrorMessageLabel model =
 
 login : Model -> (Model, Cmd Msg)
 login model =
-  case (model.userDetails.email, model.userDetails.password) of
+  case (model.loginPageModel.email, model.loginPageModel.password) of
     (Just e, Just p) ->
       let
         userEmpty = String.isEmpty (String.trim e)
         passEmpty = String.isEmpty (String.trim p)
       in
         if (userEmpty || passEmpty) then
-          ({model | loginPageError = (Just (LoginPageError EmailOrPasswordEmpty))}, Cmd.none)
+          (model |> updateLoginPageError (Just (LoginPageError EmailOrPasswordEmpty)), Cmd.none)
         else
           makeLoginHttpRequest model e p
     _ ->
-      ({model | loginPageError = (Just (LoginPageError EmailOrPasswordEmpty))}, Cmd.none)
+      (model |> updateLoginPageError (Just (LoginPageError EmailOrPasswordEmpty)), Cmd.none)
 
 makeLoginHttpRequest : Model -> Email -> Password -> (Model, Cmd Msg)
 makeLoginHttpRequest m e p =

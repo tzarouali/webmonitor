@@ -1,4 +1,4 @@
-module Settings exposing(..)
+module RestApiSettings exposing(..)
 
 import Model exposing (..)
 import Uuid as U exposing (..)

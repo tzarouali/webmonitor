@@ -1,9 +1,9 @@
 module Msg exposing (..)
 
 import Model exposing (..)
-import Http
-import Navigation
-import Task
+import Http as Http
+import Navigation as Navigation
+import Task as Task
 
 
 type Msg =

@@ -22,12 +22,7 @@ main =
 
 init : Navigation.Location -> (Model, Cmd Msg)
 init _ =
-  ({ history = []
-    , userDetails = {email = Nothing, password = Nothing, token = Nothing, userId = Nothing}
-    , subscriptions = []
-    , loginPageError = Nothing
-    , homePageError = Nothing
-    }
+  ( initModel
   , genUrlMsgCommand ShowLogin
   )
 

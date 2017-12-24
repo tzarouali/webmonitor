@@ -1,6 +1,6 @@
 module AppRouter exposing(..)
 
-import UrlParser as P exposing (s, top)
+import UrlParser as P exposing (s)
 import Model exposing (..)
 import Msg exposing (..)
 import Navigation exposing (..)
@@ -13,28 +13,32 @@ import Routes as R exposing (..)
 route : P.Parser (Route -> a) a
 route =
   P.oneOf
-    [ P.map R.Home (P.s "home")
-    , P.map R.Login (P.s "login")
+    [ P.map R.Home (P.s R.homePathEnd)
+    , P.map R.Login (P.s R.loginPathEnd)
     ]
 
 update : UrlMsgType -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     UrlChange newUrl ->
-      ({model | history = P.parseHash route newUrl :: model.history}
-      , Cmd.none)
+      let
+        routeHist = model.commonModel.routeHistory
+      in
+        (model |> updateRouteHistory (P.parseHash route newUrl :: routeHist), Cmd.none)
+
     ShowHome ->
       let
-        comm1 = Navigation.newUrl "#/home"
+        comm1 = Navigation.newUrl R.homePathHash
         comm2 = genHomeMsgCommand LoadSubscriptions
       in
-      (model, Cmd.batch [comm1, comm2])
+        (model, Cmd.batch [comm1, comm2])
+
     ShowLogin ->
-      (model, Navigation.newUrl "#/login")
+      (model, Navigation.newUrl R.loginPathHash)
 
 view : Model -> Html Msg
 view model =
-  case model.history of
+  case model.commonModel.routeHistory of
     currentLocation :: _ ->
       case currentLocation of
         Just route ->

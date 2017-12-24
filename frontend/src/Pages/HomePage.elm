@@ -2,7 +2,7 @@ module Pages.HomePage exposing (view, update, subscriptions)
 
 import Msg exposing (..)
 import Model exposing (..)
-import Settings as S exposing (..)
+import RestApiSettings as S exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -30,7 +30,7 @@ view model =
 
 generateSubscriptionHtml : Model -> Html HomePageMsgType
 generateSubscriptionHtml model =
-  case model.subscriptions of
+  case model.homePageModel.subscriptions of
     [] ->
       div [style [("font-size", "20px"), ("background", "red"), ("text-align", "center")]]
       [text "No subscriptions available!"]
@@ -40,8 +40,8 @@ generateSubscriptionHtml model =
 renderSubscription : UserSubscription -> Html HomePageMsgType
 renderSubscription s =
   let
-    colorClass = Maybe.map (\d -> if d.changed then "backgroundAnimated" else "") s.data
-      |> Maybe.withDefault ""
+    colorClass =
+      Maybe.map (\ d -> if d.changed then "backgroundAnimated" else "") s.data |> Maybe.withDefault ""
   in
     div [class "col-md-3", style [("background", "#aabbcc"), ("text-align", "center"), ("margin", "3px")]]
     [ span [style [("font-weight", "bold")]]
@@ -54,7 +54,7 @@ renderSubscription s =
     , br [] []
     , div []
       [ span [class colorClass]
-        [text (Maybe.withDefault "" (s.data |> Maybe.andThen (\d -> Just d.value)))
+        [text (Maybe.withDefault "" (s.data |> Maybe.andThen (\ d -> Just d.value)))
         ]
       ]
     , br [] []
@@ -64,7 +64,7 @@ renderSubscription s =
     , br [] []
     , div []
       [ span [class colorClass]
-        [text (Maybe.withDefault "" (s.data |> Maybe.andThen (\d -> Just (DF.format "%Y-%m-%d %H:%M:%S" d.lastUpdated))))]
+        [text (Maybe.withDefault "" (s.data |> Maybe.andThen (\ d -> Just (DF.format "%Y-%m-%d %H:%M:%S" d.lastUpdated))))]
         ]
     , br [] []
     , div [class "form-horizontal,row"]
@@ -85,16 +85,16 @@ update msg model =
     RetrieveSubscriptionDetail subId ->
       (model, Cmd.none)
     HttpGetSubscriptions (Ok subscriptions) ->
-      ({model | subscriptions = subscriptions}, Cmd.none)
+      (model |> updateUserSubscriptions subscriptions, Cmd.none)
     HttpGetSubscriptions (Err e) ->
-      ({model | homePageError = (Just (HomePageError LoadingSubscriptionsError))}, Cmd.none)
+      (model |> updateHomePageError (Just (HomePageError LoadingSubscriptionsError)), Cmd.none)
 
 updateSubscription : Model -> String -> Model
 updateSubscription model newSocketString =
   case parseSubscriptionIdFromSocketMsg newSocketString of
     Just subId ->
       let
-        parts = List.partition (\s -> s.id == subId) model.subscriptions
+        parts = List.partition (\ s -> s.id == subId) model.homePageModel.subscriptions
         subToUpdate = List.head (Tuple.first parts)
       in
         case subToUpdate of
@@ -104,7 +104,7 @@ updateSubscription model newSocketString =
               subsUpdated = [newS] ++ (Tuple.second parts)
               sortedSubs = List.sortBy .name subsUpdated
             in
-              {model | subscriptions = sortedSubs}
+              model |> updateUserSubscriptions sortedSubs
           _ ->
             model
     _ ->
@@ -127,20 +127,21 @@ parseSubscriptionValueFromString prevData socketMessage =
     case (subId, subValue, subUpdatedDate) of
       (Ok subId, Ok value, Ok date) ->
         let
-          changed = ME.unwrap True (\d -> d.value /= value) prevData
+          changed = ME.unwrap True (\ d -> d.value /= value) prevData
         in
           Just ({subId = subId
                 , value = value
                 , lastUpdated = date
-                , changed = changed})
+                , changed = changed
+               })
       _ ->
         Nothing
 
 retrieveSubscriptions : Model -> (Model, Cmd Msg)
 retrieveSubscriptions model =
   let
-    maybeToken = model.userDetails.token
-    maybeUserId = Maybe.map U.toString model.userDetails.userId
+    maybeToken = model.commonModel.userSession.token
+    maybeUserId = Maybe.map U.toString model.commonModel.userSession.userId
     req = HT.get S.subscriptionsUri
           |> HT.withExpect (Http.expectJson subscriptionsDecoder)
           |> HT.withHeader S.tokenHeaderName (Maybe.withDefault "" maybeToken)
@@ -165,13 +166,13 @@ subscriptionsDecoder =
 
 subscriptions : Model -> List (Sub Msg)
 subscriptions model =
-  case model.subscriptions of
+  case model.homePageModel.subscriptions of
     [] ->
       [Sub.map HomePageMsg Sub.none]
     ss ->
-      case (model.userDetails.token, model.userDetails.userId) of
+      case (model.commonModel.userSession.token, model.commonModel.userSession.userId) of
         (Just token, Just userId) ->
-          List.map (\s ->
+          List.map (\ s ->
             let
               socketUri = S.subscriptionSocketUri s.id userId token
               wsResult = WebSocket.listen socketUri NewSubscriptionValue
