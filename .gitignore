@@ -1,7 +1,7 @@
-backend/target/
-backend/.idea/
-backend/project/target
-backend/project/project/
+restapi/target/
+restapi/.idea/
+restapi/project/target
+restapi/project/project/
 frontend/node_modules
 frontend/elm-stuff
 frontend/dist
