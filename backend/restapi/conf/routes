@@ -1,0 +1,5 @@
+POST        /api/login                                          controllers.SessionController.login()
+POST        /api/logout                                         controllers.SessionController.logout()
+
+GET         /api/subscriptions                                  controllers.SubscriptionController.getSubscriptions()
+POST        /api/subscriptions                                  controllers.SubscriptionController.createNewSubscription()

@@ -8,7 +8,7 @@ tokenHeaderName = "X-TOKEN-HEADER"
 userIdHeaderName = "X-USER-ID-HEADER"
 
 baseApiUri = "http://localhost:9000/api"
-baseSocketApiUri = "ws://localhost:9000/api"
+baseSocketApiUri = "ws://localhost:9001/api"
 
 loginUri = baseApiUri ++ "/login"
 logoutUri = baseApiUri ++ "/logout"
